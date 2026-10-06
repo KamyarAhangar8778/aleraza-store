@@ -323,7 +323,52 @@ export default function AlerazaLandingPage() {
         </section>
 
         {/* =========================================================
-            SECTION 2 (DIRECTLY UNDER HERO): PRODUCT CATEGORIES
+            SECTION 2 (DIRECTLY UNDER HERO): SPECIAL DISCOUNTED SHOWCASE (TOP DISCOUNTS)
+           ========================================================= */}
+        <section
+          id="discounted-grid"
+          className="py-10 bg-gradient-to-b from-[#F3EFE6]/70 via-[#FAF7F2] to-[#FAF7F2] border-b border-[#E6DFD3]"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
+                  <Sparkles className="w-4 h-4" />
+                  پیشنهادهای شگفت‌انگیز و تخفیف‌دار اول صفحه
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
+                  لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
+                </h3>
+              </div>
+              <span className="text-xs text-[#6E675F]">
+                تخفیف‌های ویژه با زمان و تعداد محدود
+              </span>
+            </div>
+
+            {discountedProducts.length === 0 ? (
+              <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
+                <p className="text-sm font-bold text-[#6E675F]">
+                  در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {discountedProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    category={categories.find((c) => c.id === product.categoryId)}
+                    isFeaturedDiscount={true}
+                    onSelectProduct={(p) => setSelectedProductDetail(p)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* =========================================================
+            SECTION 3: PRODUCT CATEGORIES
            ========================================================= */}
         <section id="categories-section" className="py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-3">
@@ -428,7 +473,7 @@ export default function AlerazaLandingPage() {
         </section>
 
         {/* =========================================================
-            SECTION 3 (DIRECTLY UNDER CATEGORIES): FULL PRODUCT CATALOG & SEARCH/SORT TOOLBAR
+            SECTION 4: FULL PRODUCT CATALOG & SEARCH/SORT TOOLBAR
            ========================================================= */}
         <section id="all-products-section" className="py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-3">
@@ -511,51 +556,6 @@ export default function AlerazaLandingPage() {
               ))}
             </div>
           )}
-        </section>
-
-        {/* =========================================================
-            SECTION 4: DISCOUNTED PRODUCTS SHOWCASE (TOP DISCOUNTS)
-           ========================================================= */}
-        <section
-          id="discounted-grid"
-          className="py-10 bg-gradient-to-b from-[#F3EFE6]/60 via-[#FAF7F2] to-[#FAF7F2] border-y border-[#E6DFD3]"
-        >
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
-                  <Sparkles className="w-4 h-4" />
-                  پیشنهادهای شگفت‌انگیز
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
-                  لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
-                </h3>
-              </div>
-              <span className="text-xs text-[#6E675F]">
-                تخفیف‌های ویژه با زمان و تعداد محدود
-              </span>
-            </div>
-
-            {discountedProducts.length === 0 ? (
-              <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
-                <p className="text-sm font-bold text-[#6E675F]">
-                  در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {discountedProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    category={categories.find((c) => c.id === product.categoryId)}
-                    isFeaturedDiscount={true}
-                    onSelectProduct={(p) => setSelectedProductDetail(p)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
         </section>
 
         {/* =========================================================
