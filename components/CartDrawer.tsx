@@ -13,6 +13,7 @@ import {
 import { useStore } from './StoreProvider';
 import { formatToman, toPersianDigits, resolveAssetUrl } from '@/lib/store-data';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
+import { Toman } from './TomanIcon';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -110,9 +111,12 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <h4 className="text-xs font-bold text-[#181615] line-clamp-1">
                       {product.title}
                     </h4>
-                    <p className="text-xs font-extrabold text-[#C85A32] mt-1">
-                      {formatToman(unitPrice)} تومان
-                    </p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs font-extrabold text-[#C85A32]">
+                        {formatToman(unitPrice)}
+                      </span>
+                      <Toman className="text-[10px] text-[#8C837A]" />
+                    </div>
                     <div className="mt-2 flex items-center justify-between">
                       <div className="inline-flex items-center gap-2 rounded-lg bg-[#F3EFE6] px-2 py-1">
                         <button
@@ -162,9 +166,12 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#6E675F]">مبلغ قابل پرداخت:</span>
-              <span className="text-lg font-black text-[#181615]">
-                {formatToman(totalAmount)} <span className="text-xs font-normal">تومان</span>
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-[#181615]">
+                  {formatToman(totalAmount)}
+                </span>
+                <Toman className="text-xs text-[#8C837A] font-medium" />
+              </div>
             </div>
 
             <button

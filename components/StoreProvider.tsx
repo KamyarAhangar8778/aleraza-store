@@ -79,8 +79,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [users, setUsers] = useState<UserAccount[]>(INITIAL_USERS);
-  const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const savedUser = localStorage.getItem(SESSION_STORAGE_KEY);
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -89,22 +105,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => {
       setToastMessage((prev) => (prev === msg ? null : prev));
     }, 3800);
-  }, []);
-
-  // Restore local session & cart
-  useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem(SESSION_STORAGE_KEY);
-      if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
-      }
-      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
-      }
-    } catch {
-      // ignore storage errors
-    }
   }, []);
 
   // Save cart changes

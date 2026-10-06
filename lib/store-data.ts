@@ -153,9 +153,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       '/images/fridge_water_filter.jpg',
       '/images/hero_appliance_accessories.jpg',
-      '/images/aleraza_hero_kitchen.jpg',
     ],
-    maxCarouselImages: 3,
+    maxCarouselImages: 2,
     features: [
       'دارای استاندارد بهداشت آب آشامیدنی NSF/ANSI 42 & 53',
       'شامل ۱ عدد فیلتر تصفیه آب داخلی/خارجی + ۱ عدد فیلتر هوای آنتی‌باکتریال یخچال',
@@ -278,9 +277,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       '/images/stand_mixer_copper.jpg',
       '/images/hero_appliance_accessories.jpg',
-      '/images/aleraza_hero_kitchen.jpg',
     ],
-    maxCarouselImages: 3,
+    maxCarouselImages: 2,
     features: [
       'ساخته‌شده از استیل ضدزنگ تقویت‌شده مناسب برای همزن‌های کاسه‌دار ۵ تا ۷ لیتری',
       'شامل سری همزن بالونی ۱۲ پره، پدال لیسک‌دار خامه‌زن و قلاب خمیرگیر سنگین',

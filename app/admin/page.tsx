@@ -1412,91 +1412,119 @@ export default function WordPressAdminPage() {
                     </div>
 
                     <div className="p-4 space-y-4">
-                      <div className="space-y-2">
-                        {editingProduct.images.map((imgUrl, idx) => {
-                          const activeInCarousel = idx < editingProduct.maxCarouselImages;
-                          return (
-                            <div
-                              key={idx}
-                              className={`flex flex-wrap sm:flex-nowrap items-center gap-3 p-2.5 rounded border ${
-                                activeInCarousel
-                                  ? 'bg-[#f6f7f7] border-[#c3c4c7]'
-                                  : 'bg-gray-50 border-dashed border-gray-300 opacity-60'
-                              }`}
-                            >
-                              <img
-                                src={resolveAssetUrl(imgUrl)}
-                                alt=""
-                                className="h-12 w-16 rounded object-cover border border-[#c3c4c7] flex-shrink-0"
-                              />
-                              <div className="flex-1 min-w-[180px]">
-                                <div className="flex items-center gap-2 text-[11px] font-bold mb-1">
-                                  <span>اسلاید #{toPersianDigits(idx + 1)}</span>
-                                  {!activeInCarousel && (
-                                    <span className="text-[#d63638]">
-                                      (خارج از سقف {toPersianDigits(editingProduct.maxCarouselImages)} عکس)
-                                    </span>
-                                  )}
-                                </div>
-                                <input
-                                  type="text"
-                                  dir="ltr"
-                                  value={imgUrl}
-                                  onChange={(e) => {
-                                    const next = [...editingProduct.images];
-                                    next[idx] = e.target.value;
-                                    setEditingProduct({ ...editingProduct, images: next });
-                                  }}
-                                  className="w-full rounded border border-[#8c8f94] bg-white px-2.5 py-1 text-xs font-mono"
+                      {editingProduct.images.length > 0 ? (
+                        <div className="space-y-2">
+                          {editingProduct.images.map((imgUrl, idx) => {
+                            const activeInCarousel = idx < editingProduct.maxCarouselImages;
+                            return (
+                              <div
+                                key={idx}
+                                className={`flex flex-wrap sm:flex-nowrap items-center gap-3 p-2.5 rounded border ${
+                                  activeInCarousel
+                                    ? 'bg-[#f6f7f7] border-[#c3c4c7]'
+                                    : 'bg-gray-50 border-dashed border-gray-300 opacity-60'
+                                }`}
+                              >
+                                <img
+                                  src={resolveAssetUrl(imgUrl)}
+                                  alt=""
+                                  className="h-12 w-16 rounded object-cover border border-[#c3c4c7] flex-shrink-0"
                                 />
-                              </div>
+                                <div className="flex-1 min-w-[180px]">
+                                  <div className="flex items-center gap-2 text-[11px] font-bold mb-1">
+                                    <span>اسلاید #{toPersianDigits(idx + 1)}</span>
+                                    {!activeInCarousel && (
+                                      <span className="text-[#d63638]">
+                                        (خارج از سقف {toPersianDigits(editingProduct.maxCarouselImages)} عکس)
+                                      </span>
+                                    )}
+                                  </div>
+                                  <input
+                                    type="text"
+                                    dir="ltr"
+                                    value={imgUrl}
+                                    onChange={(e) => {
+                                      const next = [...editingProduct.images];
+                                      next[idx] = e.target.value;
+                                      setEditingProduct({ ...editingProduct, images: next });
+                                    }}
+                                    className="w-full rounded border border-[#8c8f94] bg-white px-2.5 py-1 text-xs font-mono"
+                                  />
+                                </div>
 
-                              <div className="flex items-center gap-1">
-                                <button
-                                  type="button"
-                                  disabled={idx === 0}
-                                  onClick={() => {
-                                    const next = [...editingProduct.images];
-                                    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
-                                    setEditingProduct({ ...editingProduct, images: next });
-                                  }}
-                                  className="p-1.5 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
-                                >
-                                  <ArrowUp className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={idx === editingProduct.images.length - 1}
-                                  onClick={() => {
-                                    const next = [...editingProduct.images];
-                                    [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
-                                    setEditingProduct({ ...editingProduct, images: next });
-                                  }}
-                                  className="p-1.5 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
-                                >
-                                  <ArrowDown className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const next = editingProduct.images.filter((_, i) => i !== idx);
-                                    setEditingProduct({
-                                      ...editingProduct,
-                                      images:
-                                        next.length > 0
-                                          ? next
-                                          : ['/images/aleraza_hero_kitchen.jpg'],
-                                    });
-                                  }}
-                                  className="p-1.5 rounded border border-[#d63638] text-[#d63638] bg-white hover:bg-[#d63638] hover:text-white transition"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    disabled={idx === 0}
+                                    onClick={() => {
+                                      const next = [...editingProduct.images];
+                                      [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+                                      setEditingProduct({ ...editingProduct, images: next });
+                                    }}
+                                    className="p-1.5 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
+                                  >
+                                    <ArrowUp className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={idx === editingProduct.images.length - 1}
+                                    onClick={() => {
+                                      const next = [...editingProduct.images];
+                                      [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
+                                      setEditingProduct({ ...editingProduct, images: next });
+                                    }}
+                                    className="p-1.5 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
+                                  >
+                                    <ArrowDown className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const next = editingProduct.images.filter((_, i) => i !== idx);
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        images: next,
+                                      });
+                                    }}
+                                    title="حذف این تصویر"
+                                    className="p-1.5 rounded border border-[#d63638] text-[#d63638] bg-white hover:bg-[#d63638] hover:text-white transition"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="p-4 rounded border border-dashed border-[#c3c4c7] bg-[#f9f9f9] text-center space-y-2">
+                          <p className="text-xs font-bold text-[#1d2327]">
+                            این محصول هیچ تصویری ندارد (حالت بدون عکس)
+                          </p>
+                          <p className="text-[11px] text-[#50575e]">
+                            در سایت و کاروسل، نماد اختصاصی و استاندارد «فاقد عکس» نمایش داده می‌شود و هیچ تصویر اجباری قرار نمی‌گیرد.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Clear All Images Button if product has images */}
+                      {editingProduct.images.length > 0 && (
+                        <div className="flex justify-end pt-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingProduct({
+                                ...editingProduct,
+                                images: [],
+                              });
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded border border-[#d63638] bg-[#fcf0f1] px-3 py-1.5 text-xs font-bold text-[#d63638] hover:bg-[#d63638] hover:text-white transition cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            حذف تمام عکس‌های این محصول (ثبت به عنوان محصول بدون عکس)
+                          </button>
+                        </div>
+                      )}
 
                       {/* Add new carousel photo */}
                       <div className="flex flex-wrap gap-2 pt-2">
@@ -2428,6 +2456,24 @@ export default function WordPressAdminPage() {
                         </div>
                       );
                     })}
+
+                    {/* Clear All Images Button */}
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateProductCarousel(
+                            selectedMediaProduct.id,
+                            [],
+                            selectedMediaProduct.maxCarouselImages
+                          );
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded border border-[#d63638] bg-[#fcf0f1] px-3 py-1.5 text-xs font-bold text-[#d63638] hover:bg-[#d63638] hover:text-white transition cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        حذف تمام عکس‌های این محصول (ثبت به عنوان محصول بدون عکس)
+                      </button>
+                    </div>
                   </div>
                 )}
 

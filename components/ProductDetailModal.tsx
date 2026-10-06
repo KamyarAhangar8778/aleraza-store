@@ -22,6 +22,7 @@ import {
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
+import { Toman } from './TomanIcon';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -198,17 +199,16 @@ export function ProductDetailModal({
             <div>
               {product.isDiscounted && product.discountedPrice < product.price ? (
                 <>
-                  <div className="text-xs text-[#8C837A] line-through">
-                    قیمت قبل از تخفیف: {formatToman(product.price)} تومان
+                  <div className="flex items-center gap-1 text-xs text-[#8C837A]">
+                    <span>قیمت قبل از تخفیف:</span>
+                    <span className="line-through">{formatToman(product.price)}</span>
+                    <Toman className="text-[10px] text-[#8C837A]" />
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-2xl font-black text-[#D92D20]">
                       {formatToman(product.discountedPrice)}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-2 py-0.5 text-[11px] font-black tracking-tighter text-[#C85A32] shadow-xs select-none">
-                      <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
-                      تومان
-                    </span>
+                    <Toman className="text-xs text-[#8C837A] font-medium" />
                   </div>
                 </>
               ) : (
@@ -216,10 +216,7 @@ export function ProductDetailModal({
                   <span className="text-2xl font-black text-[#181615]">
                     {formatToman(product.price)}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-2 py-0.5 text-[11px] font-black tracking-tighter text-[#C85A32] shadow-xs select-none">
-                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
-                    تومان
-                  </span>
+                  <Toman className="text-xs text-[#8C837A] font-medium" />
                 </div>
               )}
             </div>

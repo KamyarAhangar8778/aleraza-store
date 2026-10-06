@@ -22,6 +22,7 @@ import {
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
+import { Toman } from './TomanIcon';
 
 interface ProductCardProps {
   product: Product;
@@ -285,10 +286,7 @@ export function ProductCard({
                   <span className="text-xl font-extrabold text-[#181615] tracking-tight">
                     {formatToman(product.discountedPrice)}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#C85A32] shadow-[0_1px_2px_rgba(0,0,0,0.04)] select-none">
-                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
-                    تومان
-                  </span>
+                  <Toman className="text-[11px] text-[#8C837A] font-medium" />
                 </div>
               </div>
             ) : (
@@ -298,10 +296,7 @@ export function ProductCard({
                   <span className="text-xl font-extrabold text-[#181615] tracking-tight">
                     {formatToman(product.price)}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#C85A32] shadow-[0_1px_2px_rgba(0,0,0,0.04)] select-none">
-                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
-                    تومان
-                  </span>
+                  <Toman className="text-[11px] text-[#8C837A] font-medium" />
                 </div>
               </div>
             )}
