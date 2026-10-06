@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Product category in Aleraza home appliance store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "iconName": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "slug", "order", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Home appliance product with customizable multi-image carousel, pricing, and discount status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "price": { "type": "number" },
+        "discountedPrice": { "type": "number" },
+        "isDiscounted": { "type": "boolean" },
+        "images": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "maxCarouselImages": { "type": "number" },
+        "features": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "badge": { "type": "string" },
+        "stock": { "type": "number" },
+        "warranty": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": [
+        "id",
+        "title",
+        "categoryId",
+        "price",
+        "discountedPrice",
+        "isDiscounted",
+        "images",
+        "maxCarouselImages",
+        "createdAt"
+      ]
+    },
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "User account supporting phone + name + password login as well as Google authentication",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "password": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "customer"] },
+        "email": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "fullName", "phone", "password", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Store product categories"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Store products with carousel images and pricing"
+    },
+    "/users_directory/{userId}": {
+      "schema": { "$ref": "#/entities/UserAccount" },
+      "description": "Registered users and admin-created accounts with phone, name, and password"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['id', 'name', 'slug', 'order', 'createdAt']) &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 120 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 120 &&
+             data.slug is string && data.slug.size() > 0 && data.slug.size() <= 120 &&
+             data.order is number &&
+             data.createdAt is string && data.createdAt.size() <= 60;
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['id', 'title', 'categoryId', 'price', 'discountedPrice', 'isDiscounted', 'images', 'maxCarouselImages', 'createdAt']) &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 120 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 250 &&
+             data.categoryId is string && data.categoryId.size() > 0 && data.categoryId.size() <= 120 &&
+             data.price is number && data.price >= 0 &&
+             data.discountedPrice is number && data.discountedPrice >= 0 &&
+             data.isDiscounted is bool &&
+             data.images is list && data.images.size() <= 20 &&
+             data.maxCarouselImages is number && data.maxCarouselImages >= 1 && data.maxCarouselImages <= 20 &&
+             data.createdAt is string && data.createdAt.size() <= 60;
+    }
+
+    function isValidUserAccount(data) {
+      return data.keys().hasAll(['id', 'fullName', 'phone', 'password', 'role', 'createdAt']) &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 120 &&
+             data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 150 &&
+             data.phone is string && data.phone.size() >= 4 && data.phone.size() <= 30 &&
+             data.password is string && data.password.size() >= 3 && data.password.size() <= 120 &&
+             data.role in ['admin', 'customer'] &&
+             data.createdAt is string && data.createdAt.size() <= 60;
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isValidCategory(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isValidProduct(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /users_directory/{userId} {
+      allow read: if true;
+      allow create, update: if isValidUserAccount(request.resource.data);
+      allow delete: if true;
+    }
+  }
+}
