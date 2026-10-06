@@ -21,6 +21,7 @@ import {
   cacheImageResource,
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 
 interface ProductCardProps {
   product: Product;
@@ -40,24 +41,27 @@ export function ProductCard({
   const { addToCart, currentUser } = useStore();
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Slice images according to maxCarouselImages configured by admin
-  const visibleImages =
-    product.images && product.images.length > 0
-      ? product.images.slice(0, Math.max(1, product.maxCarouselImages || product.images.length))
-      : ['/images/aleraza_hero_kitchen.jpg'];
+  // Filter valid image URLs and check if product has real images
+  const validImages = (product.images || []).filter((img) => img && img.trim().length > 0);
+  const hasImages = validImages.length > 0;
+  const visibleImages = hasImages
+    ? validImages.slice(0, Math.max(1, product.maxCarouselImages || validImages.length))
+    : [];
 
-  const safeSlideIndex = activeSlide >= visibleImages.length ? 0 : activeSlide;
+  const safeSlideIndex = visibleImages.length > 0 && activeSlide < visibleImages.length ? activeSlide : 0;
   const discountPercent = product.isDiscounted
     ? calcDiscountPercent(product.price, product.discountedPrice)
     : 0;
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (visibleImages.length <= 1) return;
     setActiveSlide((prev) => (prev - 1 + visibleImages.length) % visibleImages.length);
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (visibleImages.length <= 1) return;
     setActiveSlide((prev) => (prev + 1) % visibleImages.length);
   };
 
@@ -71,25 +75,36 @@ export function ProductCard({
     >
       {/* Multi-Image Interactive Carousel Area (Lazy loaded & automatically cached on view) */}
       <div className="relative aspect-[4/3] w-full bg-[#F3EFE6] overflow-hidden select-none">
-        {visibleImages.map((imgUrl, idx) => (
-          <img
-            key={`${product.id}-slide-${idx}`}
-            src={resolveAssetUrl(imgUrl)}
-            alt={`${product.title} - تصویر ${idx + 1}`}
-            loading="lazy"
-            decoding="async"
-            onLoad={() => cacheImageResource(imgUrl)}
-            onClick={() => onSelectProduct(product)}
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-all duration-300 group-hover:scale-105 cursor-pointer ${
-              idx === safeSlideIndex
-                ? 'opacity-100 z-[1]'
-                : 'opacity-0 pointer-events-none z-0'
-            }`}
-          />
-        ))}
+        {hasImages ? (
+          <>
+            {visibleImages.map((imgUrl, idx) => (
+              <img
+                key={`${product.id}-slide-${idx}`}
+                src={resolveAssetUrl(imgUrl)}
+                alt={`${product.title} - تصویر ${idx + 1}`}
+                loading="lazy"
+                decoding="async"
+                onLoad={() => cacheImageResource(imgUrl)}
+                onClick={() => onSelectProduct(product)}
+                className={`absolute inset-0 h-full w-full object-cover object-center transition-all duration-300 group-hover:scale-105 cursor-pointer ${
+                  idx === safeSlideIndex
+                    ? 'opacity-100 z-[1]'
+                    : 'opacity-0 pointer-events-none z-0'
+                }`}
+              />
+            ))}
 
-        {/* Subtle gradient overlay at bottom for carousel controls */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+            {/* Subtle gradient overlay at bottom for carousel controls */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+          </>
+        ) : (
+          /* Geometric Fallback Emblem when Product Has No Image */
+          <ProductImagePlaceholder
+            className="h-full w-full"
+            title={product.title}
+            onClick={() => onSelectProduct(product)}
+          />
+        )}
 
         {/* Top Badges */}
         <div className="absolute top-3 inset-x-3 flex items-start justify-between gap-2 z-10">
@@ -107,18 +122,27 @@ export function ProductCard({
             )}
           </div>
 
-          {/* Image Count Indicator */}
-          <span
-            title="تعداد تصاویر فعال در کاروسل این محصول"
-            className="inline-flex items-center gap-1 rounded-lg bg-black/60 backdrop-blur-md px-2 py-1 text-[11px] font-medium text-white"
-          >
-            <Images className="w-3.5 h-3.5 text-[#E59872]" />
-            {toPersianDigits(safeSlideIndex + 1)} از {toPersianDigits(visibleImages.length)}
-          </span>
+          {/* Image Count Indicator or No-Image Indicator */}
+          {hasImages ? (
+            <span
+              title="تعداد تصاویر فعال در کاروسل این محصول"
+              className="inline-flex items-center gap-1 rounded-lg bg-black/60 backdrop-blur-md px-2 py-1 text-[11px] font-medium text-white"
+            >
+              <Images className="w-3.5 h-3.5 text-[#E59872]" />
+              {toPersianDigits(safeSlideIndex + 1)} از {toPersianDigits(visibleImages.length)}
+            </span>
+          ) : (
+            <span
+              title="برای این کالا هنوز تصویری ثبت نشده است"
+              className="inline-flex items-center gap-1 rounded-lg bg-[#C85A32]/85 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold text-white shadow-xs"
+            >
+              فاقد عکس
+            </span>
+          )}
         </div>
 
         {/* Next / Prev Carousel Buttons (when > 1 image) */}
-        {visibleImages.length > 1 && (
+        {hasImages && visibleImages.length > 1 && (
           <>
             <button
               type="button"
@@ -190,7 +214,7 @@ export function ProductCard({
       </div>
 
       {/* Mini Thumbnail Strip under Main Carousel Image */}
-      {visibleImages.length > 1 && (
+      {hasImages && visibleImages.length > 1 && (
         <div className="flex items-center gap-1.5 px-4 pt-3 pb-1 overflow-x-auto no-scrollbar">
           {visibleImages.map((imgUrl, idx) => (
             <button

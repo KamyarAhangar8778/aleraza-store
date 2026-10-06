@@ -404,8 +404,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // Product & Carousel & Price management
   const saveProduct = async (product: Product) => {
     const safeImages = (product.images || []).filter((img) => img && img.trim().length > 0);
-    const finalImages =
-      safeImages.length > 0 ? safeImages : ['/images/aleraza_hero_kitchen.jpg'];
+    const finalImages = safeImages; // Can be empty if product has no images
 
     let rawPrice = Math.max(0, Math.round(Number(product.price) || 0));
     let rawDiscounted = Math.max(0, Math.round(Number(product.discountedPrice) || 0));
@@ -431,7 +430,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       isDiscounted: Boolean(product.isDiscounted),
       maxCarouselImages: Math.min(
         20,
-        Math.max(1, Number(product.maxCarouselImages) || finalImages.length)
+        Math.max(1, Number(product.maxCarouselImages) || (finalImages.length > 0 ? finalImages.length : 1))
       ),
       images: finalImages.slice(0, 20),
       features: Array.isArray(product.features) ? product.features : [],
@@ -515,11 +514,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   ) => {
     const existing = products.find((p) => p.id === productId);
     if (!existing) return;
-    const cleanImages = images.filter((u) => u.trim().length > 0);
+    const cleanImages = images.filter((u) => u && u.trim().length > 0);
     const updated: Product = {
       ...existing,
-      images: cleanImages.length > 0 ? cleanImages : ['/images/aleraza_hero_kitchen.jpg'],
-      maxCarouselImages: Math.min(20, Math.max(1, Number(maxCarouselImages) || 1)),
+      images: cleanImages,
+      maxCarouselImages: Math.min(20, Math.max(1, Number(maxCarouselImages) || (cleanImages.length > 0 ? cleanImages.length : 1))),
     };
     await setDoc(doc(db, 'products', productId), updated);
     showToast(`کاروسل تصاویر «${existing.title}» بروزرسانی شد.`);

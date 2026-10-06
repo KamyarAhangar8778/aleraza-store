@@ -21,6 +21,7 @@ import {
   cacheImageResource,
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -38,12 +39,13 @@ export function ProductDetailModal({
 
   if (!product) return null;
 
-  const visibleImages =
-    product.images && product.images.length > 0
-      ? product.images.slice(0, Math.max(1, product.maxCarouselImages || product.images.length))
-      : ['/images/aleraza_hero_kitchen.jpg'];
+  const validImages = (product.images || []).filter((img) => img && img.trim().length > 0);
+  const hasImages = validImages.length > 0;
+  const visibleImages = hasImages
+    ? validImages.slice(0, Math.max(1, product.maxCarouselImages || validImages.length))
+    : [];
 
-  const safeSlide = activeSlide >= visibleImages.length ? 0 : activeSlide;
+  const safeSlide = visibleImages.length > 0 && activeSlide < visibleImages.length ? activeSlide : 0;
   const discountPercent = product.isDiscounted
     ? calcDiscountPercent(product.price, product.discountedPrice)
     : 0;
@@ -62,77 +64,85 @@ export function ProductDetailModal({
         {/* Right Side: Interactive Product Image Carousel */}
         <div className="md:col-span-6 bg-[#F3EFE6] p-5 flex flex-col justify-between">
           <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-white border border-[#E6DFD3]">
-            {visibleImages.map((imgUrl, idx) => (
-              <img
-                key={`${product.id}-modal-slide-${idx}`}
-                src={resolveAssetUrl(imgUrl)}
-                alt={`${product.title} - تصویر ${idx + 1}`}
-                loading="lazy"
-                decoding="async"
-                onLoad={() => cacheImageResource(imgUrl)}
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${
-                  idx === safeSlide ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none z-0'
-                }`}
-              />
-            ))}
-
-            <div className="absolute top-3 right-3 flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-lg bg-black/65 backdrop-blur-md px-2.5 py-1 text-xs font-medium text-white">
-                <Images className="w-3.5 h-3.5 text-[#E59872]" />
-                تصویر {toPersianDigits(safeSlide + 1)} از {toPersianDigits(visibleImages.length)}
-              </span>
-            </div>
-
-            {visibleImages.length > 1 && (
+            {hasImages ? (
               <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveSlide(
-                      (prev) => (prev - 1 + visibleImages.length) % visibleImages.length
-                    )
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#181615] shadow hover:bg-[#C85A32] hover:text-white transition"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveSlide((prev) => (prev + 1) % visibleImages.length)
-                  }
-                  className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#181615] shadow hover:bg-[#C85A32] hover:text-white transition"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+                {visibleImages.map((imgUrl, idx) => (
+                  <img
+                    key={`${product.id}-modal-slide-${idx}`}
+                    src={resolveAssetUrl(imgUrl)}
+                    alt={`${product.title} - تصویر ${idx + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => cacheImageResource(imgUrl)}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${
+                      idx === safeSlide ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none z-0'
+                    }`}
+                  />
+                ))}
+
+                <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-black/65 backdrop-blur-md px-2.5 py-1 text-xs font-medium text-white">
+                    <Images className="w-3.5 h-3.5 text-[#E59872]" />
+                    تصویر {toPersianDigits(safeSlide + 1)} از {toPersianDigits(visibleImages.length)}
+                  </span>
+                </div>
+
+                {visibleImages.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveSlide(
+                          (prev) => (prev - 1 + visibleImages.length) % visibleImages.length
+                        )
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#181615] shadow hover:bg-[#C85A32] hover:text-white transition"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveSlide((prev) => (prev + 1) % visibleImages.length)
+                      }
+                      className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#181615] shadow hover:bg-[#C85A32] hover:text-white transition"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
               </>
+            ) : (
+              <ProductImagePlaceholder className="h-full w-full" title={product.title} />
             )}
           </div>
 
           {/* Thumbnails */}
-          <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
-            {visibleImages.map((img, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActiveSlide(i)}
-                className={`h-16 w-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition ${
-                  i === safeSlide
-                    ? 'border-[#C85A32] scale-105 shadow-sm'
-                    : 'border-transparent opacity-65 hover:opacity-100'
-                }`}
-              >
-                <img
-                  src={resolveAssetUrl(img)}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  onLoad={() => cacheImageResource(img)}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+          {hasImages && visibleImages.length > 1 && (
+            <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
+              {visibleImages.map((img, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActiveSlide(i)}
+                  className={`h-16 w-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition ${
+                    i === safeSlide
+                      ? 'border-[#C85A32] scale-105 shadow-sm'
+                      : 'border-transparent opacity-65 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={resolveAssetUrl(img)}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => cacheImageResource(img)}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Left Side: Details & Purchase */}

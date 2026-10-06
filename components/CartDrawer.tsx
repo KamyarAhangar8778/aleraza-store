@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useStore } from './StoreProvider';
 import { formatToman, toPersianDigits, resolveAssetUrl } from '@/lib/store-data';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -93,11 +94,18 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   key={product.id}
                   className="flex items-center gap-3 rounded-2xl bg-white border border-[#E6DFD3] p-3.5 shadow-xs"
                 >
-                  <img
-                    src={resolveAssetUrl(product.images[0] || '/images/aleraza_hero_kitchen.jpg')}
-                    alt={product.title}
-                    className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border border-[#E6DFD3]"
-                  />
+                  {product.images && product.images.length > 0 && product.images[0]?.trim() ? (
+                    <img
+                      src={resolveAssetUrl(product.images[0])}
+                      alt={product.title}
+                      loading="lazy"
+                      className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border border-[#E6DFD3]"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 rounded-xl overflow-hidden flex-shrink-0 border border-[#E6DFD3]">
+                      <ProductImagePlaceholder size="sm" showText={false} className="h-full w-full" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-bold text-[#181615] line-clamp-1">
                       {product.title}

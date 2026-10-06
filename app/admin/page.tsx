@@ -54,6 +54,7 @@ import {
   formatNumericInput,
   resolveAssetUrl,
 } from '@/lib/store-data';
+import { ProductImagePlaceholder } from '@/components/ProductImagePlaceholder';
 
 type WpSection =
   | 'dashboard'
@@ -104,7 +105,7 @@ export default function WordPressAdminPage() {
     price: 18500000,
     discountedPrice: 15900000,
     isDiscounted: true,
-    images: ['/images/aleraza_hero_kitchen.jpg'],
+    images: [],
     maxCarouselImages: 3,
     features: ['گارانتی ۳۶ ماهه طلایی آلِرضا سرویس', 'ارسال و نصب رایگان در سراسر کشور'],
     badge: 'پیشنهاد ویژه',
@@ -940,11 +941,17 @@ export default function WordPressAdminPage() {
                       return (
                         <tr key={prod.id} className="hover:bg-[#f6f7f7] group">
                           <td className="py-3 px-3">
-                            <img
-                              src={resolveAssetUrl(prod.images[0])}
-                              alt={prod.title}
-                              className="h-11 w-11 rounded object-cover border border-[#c3c4c7]"
-                            />
+                            {prod.images && prod.images.length > 0 && prod.images[0]?.trim() ? (
+                              <img
+                                src={resolveAssetUrl(prod.images[0])}
+                                alt={prod.title}
+                                className="h-11 w-11 rounded object-cover border border-[#c3c4c7]"
+                              />
+                            ) : (
+                              <div className="h-11 w-11 rounded overflow-hidden border border-[#c3c4c7]">
+                                <ProductImagePlaceholder size="sm" showText={false} className="h-full w-full" />
+                              </div>
+                            )}
                           </td>
                           <td className="py-3 px-3">
                             <button
@@ -1765,11 +1772,17 @@ export default function WordPressAdminPage() {
                         <tr key={prod.id} className="hover:bg-[#f6f7f7]">
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-2.5">
-                              <img
-                                src={resolveAssetUrl(prod.images[0])}
-                                alt=""
-                                className="h-10 w-10 rounded object-cover border border-[#c3c4c7]"
-                              />
+                              {prod.images && prod.images.length > 0 && prod.images[0]?.trim() ? (
+                                <img
+                                  src={resolveAssetUrl(prod.images[0])}
+                                  alt=""
+                                  className="h-10 w-10 rounded object-cover border border-[#c3c4c7]"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded overflow-hidden border border-[#c3c4c7] shrink-0">
+                                  <ProductImagePlaceholder size="sm" showText={false} className="h-full w-full" />
+                                </div>
+                              )}
                               <span className="font-bold text-[#1d2327]">{prod.title}</span>
                             </div>
                           </td>
@@ -2304,103 +2317,119 @@ export default function WordPressAdminPage() {
                 </div>
 
                 {/* Carousel Images List */}
-                <div className="space-y-2.5">
-                  {selectedMediaProduct.images.map((imgUrl, idx) => {
-                    const isVisible = idx < selectedMediaProduct.maxCarouselImages;
-                    return (
-                      <div
-                        key={idx}
-                        className={`flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 rounded border ${
-                          isVisible
-                            ? 'bg-[#f6f7f7] border-[#c3c4c7]'
-                            : 'bg-gray-50 border-dashed border-gray-300 opacity-60'
-                        }`}
-                      >
-                        <img
-                          src={resolveAssetUrl(imgUrl)}
-                          alt=""
-                          className="h-14 w-20 rounded object-cover border border-[#c3c4c7]"
-                        />
-                        <div className="flex-1 min-w-[200px]">
-                          <div className="flex items-center gap-2 text-xs font-bold mb-1">
-                            <span>تصویر شماره {toPersianDigits(idx + 1)}</span>
-                            {!isVisible && (
-                              <span className="text-[11px] text-[#d63638]">
-                                (خارج از سقف تعداد انتخابی کاروسل)
-                              </span>
-                            )}
-                          </div>
-                          <input
-                            type="text"
-                            dir="ltr"
-                            value={imgUrl}
-                            onChange={(e) => {
-                              const next = [...selectedMediaProduct.images];
-                              next[idx] = e.target.value;
-                              updateProductCarousel(
-                                selectedMediaProduct.id,
-                                next,
-                                selectedMediaProduct.maxCarouselImages
-                              );
-                            }}
-                            className="w-full rounded border border-[#8c8f94] bg-white px-2.5 py-1.5 text-xs font-mono"
+                {(!selectedMediaProduct.images || selectedMediaProduct.images.length === 0) ? (
+                  <div className="rounded-lg border border-dashed border-[#c3c4c7] p-6 text-center space-y-3 bg-[#f9f9f9]">
+                    <div className="mx-auto h-24 w-36 rounded-xl overflow-hidden border border-[#c3c4c7]">
+                      <ProductImagePlaceholder size="sm" showText={false} className="h-full w-full" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-[#1d2327]">
+                        این محصول هنوز هیچ تصویری ندارد
+                      </p>
+                      <p className="text-[11px] text-[#50575e] mt-0.5">
+                        در فروشگاه، نماد هندسی و فنی استاندارد جایگزین تصویر نمایش داده می‌شود. از دکمه‌های زیر می‌توانید تصویر اضافه کنید.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {selectedMediaProduct.images.map((imgUrl, idx) => {
+                      const isVisible = idx < selectedMediaProduct.maxCarouselImages;
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 rounded border ${
+                            isVisible
+                              ? 'bg-[#f6f7f7] border-[#c3c4c7]'
+                              : 'bg-gray-50 border-dashed border-gray-300 opacity-60'
+                          }`}
+                        >
+                          <img
+                            src={resolveAssetUrl(imgUrl)}
+                            alt=""
+                            className="h-14 w-20 rounded object-cover border border-[#c3c4c7]"
                           />
-                        </div>
+                          <div className="flex-1 min-w-[200px]">
+                            <div className="flex items-center gap-2 text-xs font-bold mb-1">
+                              <span>تصویر شماره {toPersianDigits(idx + 1)}</span>
+                              {!isVisible && (
+                                <span className="text-[11px] text-[#d63638]">
+                                  (خارج از سقف تعداد انتخابی کاروسل)
+                                </span>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              dir="ltr"
+                              value={imgUrl}
+                              onChange={(e) => {
+                                const next = [...selectedMediaProduct.images];
+                                next[idx] = e.target.value;
+                                updateProductCarousel(
+                                  selectedMediaProduct.id,
+                                  next,
+                                  selectedMediaProduct.maxCarouselImages
+                                );
+                              }}
+                              className="w-full rounded border border-[#8c8f94] bg-white px-2.5 py-1.5 text-xs font-mono"
+                            />
+                          </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            disabled={idx === 0}
-                            onClick={() => {
-                              const next = [...selectedMediaProduct.images];
-                              [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
-                              updateProductCarousel(
-                                selectedMediaProduct.id,
-                                next,
-                                selectedMediaProduct.maxCarouselImages
-                              );
-                            }}
-                            className="p-2 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
-                          >
-                            <ArrowUp className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            disabled={idx === selectedMediaProduct.images.length - 1}
-                            onClick={() => {
-                              const next = [...selectedMediaProduct.images];
-                              [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
-                              updateProductCarousel(
-                                selectedMediaProduct.id,
-                                next,
-                                selectedMediaProduct.maxCarouselImages
-                              );
-                            }}
-                            className="p-2 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
-                          >
-                            <ArrowDown className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const next = selectedMediaProduct.images.filter(
-                                (_, i) => i !== idx
-                              );
-                              updateProductCarousel(
-                                selectedMediaProduct.id,
-                                next,
-                                selectedMediaProduct.maxCarouselImages
-                              );
-                            }}
-                            className="p-2 rounded border border-[#d63638] text-[#d63638] bg-white hover:bg-[#d63638] hover:text-white transition"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => {
+                                const next = [...selectedMediaProduct.images];
+                                [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+                                updateProductCarousel(
+                                  selectedMediaProduct.id,
+                                  next,
+                                  selectedMediaProduct.maxCarouselImages
+                                );
+                              }}
+                              className="p-2 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
+                            >
+                              <ArrowUp className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === selectedMediaProduct.images.length - 1}
+                              onClick={() => {
+                                const next = [...selectedMediaProduct.images];
+                                [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
+                                updateProductCarousel(
+                                  selectedMediaProduct.id,
+                                  next,
+                                  selectedMediaProduct.maxCarouselImages
+                                );
+                              }}
+                              className="p-2 rounded border border-[#c3c4c7] bg-white hover:bg-[#f0f0f1] disabled:opacity-30"
+                            >
+                              <ArrowDown className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = selectedMediaProduct.images.filter(
+                                  (_, i) => i !== idx
+                                );
+                                updateProductCarousel(
+                                  selectedMediaProduct.id,
+                                  next,
+                                  selectedMediaProduct.maxCarouselImages
+                                );
+                              }}
+                              className="p-2 rounded border border-[#d63638] text-[#d63638] bg-white hover:bg-[#d63638] hover:text-white transition"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Add New Image to Selected Product Carousel */}
                 <div className="flex flex-wrap gap-2 pt-3 border-t border-[#f0f0f1]">
