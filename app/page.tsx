@@ -266,14 +266,13 @@ export default function AlerazaLandingPage() {
 
       <main className="flex-1">
         {/* =========================================================
-            SECTION 1 (VERY TOP OF PAGE): DISCOUNTED PRODUCTS SHOWCASE
-            + ARCHITECTURAL HERO BANNER
+            SECTION 1: HERO SHOWCASE BANNER
            ========================================================= */}
         <section
-          id="top-discounts"
-          className="relative pt-6 pb-14 bg-gradient-to-b from-[#F3EFE6] via-[#FAF7F2] to-[#FAF7F2] border-b border-[#E6DFD3]"
+          id="hero-banner"
+          className="relative pt-6 pb-8 bg-gradient-to-b from-[#F3EFE6] via-[#FAF7F2] to-[#FAF7F2]"
         >
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Clean Customer Hero Showcase */}
             <div className="relative rounded-3xl bg-[#181615] text-[#FAF7F2] overflow-hidden border border-[#C85A32]/30 shadow-xl">
               <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
@@ -293,18 +292,18 @@ export default function AlerazaLandingPage() {
 
                   <div className="pt-2 flex flex-wrap items-center gap-3">
                     <a
-                      href="#discounted-grid"
+                      href="#categories-section"
                       className="inline-flex items-center gap-2 rounded-xl bg-[#C85A32] px-5 py-3 text-xs font-bold text-white shadow hover:bg-[#B04B25] transition"
                     >
-                      <BadgePercent className="w-4 h-4" />
-                      مشاهده لوازم جانبی تخفیف‌دار
+                      <span>مشاهده دسته‌بندی‌های لوازم جانبی</span>
+                      <ArrowLeft className="w-4 h-4" />
                     </a>
                     <a
-                      href="#categories-section"
+                      href="#discounted-grid"
                       className="inline-flex items-center gap-2 rounded-xl bg-white/10 border border-white/15 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition"
                     >
-                      <span>دسته‌بندی‌های لوازم جانبی</span>
-                      <ArrowLeft className="w-4 h-4" />
+                      <BadgePercent className="w-4 h-4" />
+                      پیشنهادهای تخفیف‌دار اول صفحه
                     </a>
                   </div>
                 </div>
@@ -320,57 +319,25 @@ export default function AlerazaLandingPage() {
                 </div>
               </div>
             </div>
-
-            {/* TOP-OF-PAGE DISCOUNTED PRODUCTS SECTION */}
-            <div id="discounted-grid" className="space-y-5">
-              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
-                <div>
-                  <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
-                    <Sparkles className="w-4 h-4" />
-                    پیشنهادهای شگفت‌انگیز اول صفحه
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
-                    لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
-                  </h3>
-                </div>
-              </div>
-
-              {discountedProducts.length === 0 ? (
-                <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
-                  <p className="text-sm font-bold text-[#6E675F]">
-                    در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {discountedProducts.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      category={categories.find((c) => c.id === product.categoryId)}
-                      isFeaturedDiscount={true}
-                      onSelectProduct={(p) => setSelectedProductDetail(p)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </section>
 
         {/* =========================================================
-            SECTION 2: PRODUCT CATEGORIES & FULL CATALOG
+            SECTION 2 (DIRECTLY UNDER HERO): PRODUCT CATEGORIES
            ========================================================= */}
-        <section id="categories-section" className="py-14 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        <section id="categories-section" className="py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-3">
             <div>
               <span className="text-xs font-extrabold text-[#C85A32]">
-                دسته‌بندی تخصصی لوازم خانگی
+                دسته‌بندی تخصصی لوازم جانبی و قطعات
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#181615] mt-1">
-                انتخاب بر اساس دسته‌بندی محصولات آلِرضا
+              <h2 className="text-xl sm:text-2xl font-black text-[#181615] mt-0.5">
+                انتخاب دسته‌بندی لوازم جانبی آلِرضا
               </h2>
             </div>
+            <span className="text-xs font-semibold text-[#6E675F]">
+              برای فیلتر کردن محصولات، روی هر دسته کلیک کنید
+            </span>
           </div>
 
           {/* Interactive Category Cards Bar */}
@@ -378,17 +345,17 @@ export default function AlerazaLandingPage() {
             <button
               type="button"
               onClick={() => setSelectedCategoryId('all')}
-              className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition ${
+              className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition cursor-pointer ${
                 selectedCategoryId === 'all'
                   ? 'bg-[#181615] text-[#FAF7F2] border-[#181615] shadow-md'
-                  : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32]'
+                  : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-xs'
               }`}
             >
-              <span className="text-xs font-extrabold text-[#C85A32]">همه کالاها</span>
+              <span className="text-xs font-extrabold text-[#C85A32]">همه دسته‌ها</span>
               <div className="mt-3">
-                <p className="text-sm font-black">کلکسیون کامل</p>
+                <p className="text-sm font-black">تمام قطعات و لوازم</p>
                 <p className="text-[11px] opacity-75 mt-0.5">
-                  {toPersianDigits(products.length)} محصول فعال
+                  {toPersianDigits(products.length)} کالا
                 </p>
               </div>
             </button>
@@ -401,10 +368,10 @@ export default function AlerazaLandingPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategoryId(cat.id)}
-                  className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition ${
+                  className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition cursor-pointer ${
                     active
                       ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-md'
-                      : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32]'
+                      : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-xs'
                   }`}
                 >
                   <span
@@ -414,7 +381,7 @@ export default function AlerazaLandingPage() {
                         : 'bg-[#F3EFE6] text-[#C85A32]'
                     }`}
                   >
-                    {toPersianDigits(count)} محصول
+                    {toPersianDigits(count)} کالا
                   </span>
                   <div className="mt-3">
                     <p className="text-sm font-extrabold line-clamp-1">{cat.name}</p>
@@ -430,6 +397,72 @@ export default function AlerazaLandingPage() {
               );
             })}
           </div>
+        </section>
+
+        {/* =========================================================
+            SECTION 3: DISCOUNTED PRODUCTS SHOWCASE (TOP DISCOUNTS)
+           ========================================================= */}
+        <section
+          id="discounted-grid"
+          className="py-10 bg-gradient-to-b from-[#F3EFE6]/60 via-[#FAF7F2] to-[#FAF7F2] border-y border-[#E6DFD3]"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
+                  <Sparkles className="w-4 h-4" />
+                  پیشنهادهای شگفت‌انگیز اول صفحه
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
+                  لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
+                </h3>
+              </div>
+              <span className="text-xs text-[#6E675F]">
+                تخفیف‌های ویژه با زمان و تعداد محدود
+              </span>
+            </div>
+
+            {discountedProducts.length === 0 ? (
+              <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
+                <p className="text-sm font-bold text-[#6E675F]">
+                  در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {discountedProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    category={categories.find((c) => c.id === product.categoryId)}
+                    isFeaturedDiscount={true}
+                    onSelectProduct={(p) => setSelectedProductDetail(p)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* =========================================================
+            SECTION 4: FULL PRODUCT CATALOG & SEARCH/SORT TOOLBAR
+           ========================================================= */}
+        <section id="all-products-section" className="py-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="text-xs font-extrabold text-[#C85A32]">
+                کاتالوگ کامل
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#181615] mt-1">
+                {selectedCategoryId === 'all'
+                  ? 'تمامی لوازم جانبی و قطعات لوازم خانگی'
+                  : categories.find((c) => c.id === selectedCategoryId)?.name || 'محصولات دسته‌بندی'}
+              </h2>
+            </div>
+            <span className="text-xs text-[#6E675F]">
+              نمایش {toPersianDigits(filteredProducts.length)} از {toPersianDigits(products.length)} کالا
+            </span>
+          </div>
 
           {/* Search & Sort Toolbar */}
           <div
@@ -442,13 +475,13 @@ export default function AlerazaLandingPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="جستجوی نام محصول، مدل یا ویژگی در فروشگاه آلِرضا..."
+                placeholder="جستجوی نام قطعه، فیلتر، مدل یا برند..."
                 className="w-full rounded-xl bg-[#FAF7F2] border border-[#DCD4C6] pr-10 pl-4 py-2.5 text-xs text-[#181615] focus:border-[#C85A32] focus:outline-none"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[#6E675F]">مرتب‌سازی:</span>
+              <span className="text-xs text-[#6E675F] font-bold">مرتب‌سازی:</span>
               <select
                 value={sortBy}
                 onChange={(e) =>
@@ -456,12 +489,12 @@ export default function AlerazaLandingPage() {
                     e.target.value as 'default' | 'discount' | 'price-asc' | 'price-desc'
                   )
                 }
-                className="rounded-xl bg-[#FAF7F2] border border-[#DCD4C6] px-3.5 py-2 text-xs font-bold text-[#181615] focus:border-[#C85A32] focus:outline-none"
+                className="rounded-xl bg-[#FAF7F2] border border-[#DCD4C6] px-3 py-2 text-xs font-bold text-[#181615] focus:outline-none cursor-pointer"
               >
-                <option value="default">جدیدترین محصولات</option>
+                <option value="default">پیش‌فرض (جدیدترین‌ها)</option>
                 <option value="discount">بیشترین درصد تخفیف</option>
-                <option value="price-asc">قیمت: کم به زیاد</option>
-                <option value="price-desc">قیمت: زیاد به کم</option>
+                <option value="price-asc">ارزان‌ترین قیمت</option>
+                <option value="price-desc">گران‌ترین قیمت</option>
               </select>
             </div>
           </div>
