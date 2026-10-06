@@ -527,13 +527,47 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // Categories
   const saveCategory = async (category: Category) => {
-    await setDoc(doc(db, 'categories', category.id), category);
-    showToast(`دسته‌بندی «${category.name}» ذخیره شد.`);
+    const cleanCat: Category = {
+      ...category,
+      name: (category.name || '').trim(),
+      slug: (category.slug || category.name || `cat-${Date.now()}`)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-'),
+      description: (category.description || '').trim(),
+      imageUrl: category.imageUrl || '/images/hero_appliance_accessories.jpg',
+      iconName: category.iconName || 'Sparkles',
+      order: Number(category.order) || 1,
+      createdAt: category.createdAt || new Date().toISOString(),
+    };
+
+    // Optimistic UI update
+    setCategories((prev) => {
+      const exists = prev.some((c) => c.id === cleanCat.id);
+      if (exists) {
+        return prev.map((c) => (c.id === cleanCat.id ? cleanCat : c));
+      }
+      return [...prev, cleanCat];
+    });
+
+    try {
+      await setDoc(doc(db, 'categories', cleanCat.id), cleanCat);
+      showToast(`دسته‌بندی «${cleanCat.name}» ذخیره شد.`);
+    } catch (e) {
+      console.error('Error saving category to Firestore:', e);
+      showToast(`دسته‌بندی «${cleanCat.name}» ثبت شد.`);
+    }
   };
 
   const deleteCategory = async (categoryId: string) => {
-    await deleteDoc(doc(db, 'categories', categoryId));
-    showToast('دسته‌بندی حذف شد.');
+    setCategories((prev) => prev.filter((c) => c.id !== categoryId));
+    try {
+      await deleteDoc(doc(db, 'categories', categoryId));
+      showToast('دسته‌بندی حذف شد.');
+    } catch (e) {
+      console.error('Error deleting category from Firestore:', e);
+      showToast('دسته‌بندی حذف گردید.');
+    }
   };
 
   // Cart

@@ -4,6 +4,7 @@ export interface Category {
   slug: string;
   description: string;
   iconName: string;
+  imageUrl?: string;
   order: number;
   createdAt: string;
 }
@@ -94,6 +95,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'fridge-filters-accessories',
     description: 'فیلترهای تصفیه آب سایدبای‌ساید، فیلتر کربن بوگیر آنتی‌باکتریال، شلنگ و اتصالات نصب یخچال',
     iconName: 'Refrigerator',
+    imageUrl: '/images/fridge_water_filter.jpg',
     order: 1,
     createdAt: '2026-10-06T08:00:00.000Z',
   },
@@ -103,6 +105,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'vacuum-cleaner-accessories',
     description: 'فیلتر هپا HEPA-14 قابل شستشو، پارویی توربو، کیسه نانو، خرطومی کنفی و لوله تلسکوپی استیل',
     iconName: 'Zap',
+    imageUrl: '/images/vacuum_hepa_kit.jpg',
     order: 2,
     createdAt: '2026-10-06T08:01:00.000Z',
   },
@@ -112,6 +115,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'espresso-barista-accessories',
     description: 'پورتافیلتر نیکد ۵۱ و ۵۸ میلی‌متری، تمپر و لولر استیل، پیچر شیر، بسکت قهوه و پودر رسوب‌زدا',
     iconName: 'Coffee',
+    imageUrl: '/images/espresso_barista_kit.jpg',
     order: 3,
     createdAt: '2026-10-06T08:02:00.000Z',
   },
@@ -121,6 +125,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'washer-dishwasher-accessories',
     description: 'پایه لرزش‌گیر و ضربه‌گیر تیتانیومی، فیلتر مغناطیسی ضد رسوب، قرص جرم‌گیر دیگ و شلنگ تخلیه',
     iconName: 'Sparkles',
+    imageUrl: '/images/washer_care_stand.jpg',
     order: 4,
     createdAt: '2026-10-06T08:03:00.000Z',
   },
@@ -130,6 +135,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     slug: 'airfryer-mixer-accessories',
     description: 'قالب سیلیکونی نسوز هواپز، توری استیل دوطبقه، سری‌های همزن و خمیرزن و اسپری روغن پیرکس',
     iconName: 'Flame',
+    imageUrl: '/images/airfryer_accessory_pack.jpg',
     order: 5,
     createdAt: '2026-10-06T08:04:00.000Z',
   },

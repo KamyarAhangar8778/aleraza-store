@@ -336,26 +336,43 @@ export default function AlerazaLandingPage() {
               </h2>
             </div>
             <span className="text-xs font-semibold text-[#6E675F]">
-              برای فیلتر کردن محصولات، روی هر دسته کلیک کنید
+              برای مشاهده و فیلتر محصولات زیر، روی هر دسته کلیک کنید
             </span>
           </div>
 
-          {/* Interactive Category Cards Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Interactive Category Cards Bar with Assigned Category Images */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
             <button
               type="button"
-              onClick={() => setSelectedCategoryId('all')}
-              className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition cursor-pointer ${
+              onClick={() => {
+                setSelectedCategoryId('all');
+                document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className={`group relative flex flex-col rounded-2xl border overflow-hidden text-right transition cursor-pointer ${
                 selectedCategoryId === 'all'
-                  ? 'bg-[#181615] text-[#FAF7F2] border-[#181615] shadow-md'
-                  : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-xs'
+                  ? 'bg-[#181615] text-[#FAF7F2] border-[#181615] shadow-lg ring-2 ring-[#C85A32]'
+                  : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-md'
               }`}
             >
-              <span className="text-xs font-extrabold text-[#C85A32]">همه دسته‌ها</span>
-              <div className="mt-3">
-                <p className="text-sm font-black">تمام قطعات و لوازم</p>
-                <p className="text-[11px] opacity-75 mt-0.5">
+              <div className="relative h-24 w-full bg-[#E6DFD3] overflow-hidden">
+                <img
+                  src={resolveAssetUrl('/images/hero_appliance_accessories.jpg')}
+                  alt="همه دسته‌ها"
+                  className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <span className="absolute bottom-2 right-2 text-[10px] font-extrabold bg-[#C85A32] text-white px-2 py-0.5 rounded-md shadow-xs">
                   {toPersianDigits(products.length)} کالا
+                </span>
+              </div>
+              <div className="p-3">
+                <p className="text-xs font-black">همه دسته‌ها</p>
+                <p
+                  className={`text-[10px] line-clamp-1 mt-0.5 ${
+                    selectedCategoryId === 'all' ? 'text-[#DCD4C6]' : 'text-[#6E675F]'
+                  }`}
+                >
+                  تمام قطعات و لوازم
                 </p>
               </div>
             </button>
@@ -363,34 +380,45 @@ export default function AlerazaLandingPage() {
             {categories.map((cat) => {
               const count = products.filter((p) => p.categoryId === cat.id).length;
               const active = selectedCategoryId === cat.id;
+              const catImg = cat.imageUrl || '/images/hero_appliance_accessories.jpg';
+
               return (
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => setSelectedCategoryId(cat.id)}
-                  className={`flex flex-col items-start justify-between rounded-2xl p-4 border text-right transition cursor-pointer ${
+                  onClick={() => {
+                    setSelectedCategoryId(cat.id);
+                    document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`group relative flex flex-col rounded-2xl border overflow-hidden text-right transition cursor-pointer ${
                     active
-                      ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-md'
-                      : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-xs'
+                      ? 'bg-[#C85A32] text-white border-[#C85A32] shadow-lg ring-2 ring-[#181615]'
+                      : 'bg-white text-[#181615] border-[#E6DFD3] hover:border-[#C85A32] hover:shadow-md'
                   }`}
                 >
-                  <span
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${
-                      active
-                        ? 'bg-white/20 text-white'
-                        : 'bg-[#F3EFE6] text-[#C85A32]'
-                    }`}
-                  >
-                    {toPersianDigits(count)} کالا
-                  </span>
-                  <div className="mt-3">
-                    <p className="text-sm font-extrabold line-clamp-1">{cat.name}</p>
-                    <p
-                      className={`text-[11px] line-clamp-1 mt-0.5 ${
-                        active ? 'text-white/85' : 'text-[#6E675F]'
+                  <div className="relative h-24 w-full bg-[#E6DFD3] overflow-hidden">
+                    <img
+                      src={resolveAssetUrl(catImg)}
+                      alt={cat.name}
+                      className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <span
+                      className={`absolute bottom-2 right-2 text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-xs ${
+                        active ? 'bg-white text-[#C85A32]' : 'bg-[#181615] text-white'
                       }`}
                     >
-                      {cat.description}
+                      {toPersianDigits(count)} کالا
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs font-extrabold line-clamp-1">{cat.name}</p>
+                    <p
+                      className={`text-[10px] line-clamp-1 mt-0.5 ${
+                        active ? 'text-white/90' : 'text-[#6E675F]'
+                      }`}
+                    >
+                      {cat.description || 'قطعات و لوازم جانبی اورجینال'}
                     </p>
                   </div>
                 </button>
@@ -400,60 +428,15 @@ export default function AlerazaLandingPage() {
         </section>
 
         {/* =========================================================
-            SECTION 3: DISCOUNTED PRODUCTS SHOWCASE (TOP DISCOUNTS)
+            SECTION 3 (DIRECTLY UNDER CATEGORIES): FULL PRODUCT CATALOG & SEARCH/SORT TOOLBAR
            ========================================================= */}
-        <section
-          id="discounted-grid"
-          className="py-10 bg-gradient-to-b from-[#F3EFE6]/60 via-[#FAF7F2] to-[#FAF7F2] border-y border-[#E6DFD3]"
-        >
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
-                  <Sparkles className="w-4 h-4" />
-                  پیشنهادهای شگفت‌انگیز اول صفحه
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
-                  لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
-                </h3>
-              </div>
-              <span className="text-xs text-[#6E675F]">
-                تخفیف‌های ویژه با زمان و تعداد محدود
-              </span>
-            </div>
-
-            {discountedProducts.length === 0 ? (
-              <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
-                <p className="text-sm font-bold text-[#6E675F]">
-                  در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {discountedProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    category={categories.find((c) => c.id === product.categoryId)}
-                    isFeaturedDiscount={true}
-                    onSelectProduct={(p) => setSelectedProductDetail(p)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* =========================================================
-            SECTION 4: FULL PRODUCT CATALOG & SEARCH/SORT TOOLBAR
-           ========================================================= */}
-        <section id="all-products-section" className="py-12 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        <section id="all-products-section" className="py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-3">
             <div>
               <span className="text-xs font-extrabold text-[#C85A32]">
-                کاتالوگ کامل
+                کاتالوگ و لیست محصولات
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#181615] mt-1">
+              <h2 className="text-xl sm:text-2xl font-black text-[#181615] mt-0.5">
                 {selectedCategoryId === 'all'
                   ? 'تمامی لوازم جانبی و قطعات لوازم خانگی'
                   : categories.find((c) => c.id === selectedCategoryId)?.name || 'محصولات دسته‌بندی'}
@@ -511,7 +494,7 @@ export default function AlerazaLandingPage() {
                   setSelectedCategoryId('all');
                   setSearchQuery('');
                 }}
-                className="rounded-xl bg-[#C85A32] px-4 py-2 text-xs font-bold text-white"
+                className="rounded-xl bg-[#C85A32] px-4 py-2 text-xs font-bold text-white cursor-pointer hover:bg-[#B04B25]"
               >
                 نمایش همه محصولات آلِرضا
               </button>
@@ -528,6 +511,51 @@ export default function AlerazaLandingPage() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* =========================================================
+            SECTION 4: DISCOUNTED PRODUCTS SHOWCASE (TOP DISCOUNTS)
+           ========================================================= */}
+        <section
+          id="discounted-grid"
+          className="py-10 bg-gradient-to-b from-[#F3EFE6]/60 via-[#FAF7F2] to-[#FAF7F2] border-y border-[#E6DFD3]"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E6DFD3] pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#D92D20] mb-1">
+                  <Sparkles className="w-4 h-4" />
+                  پیشنهادهای شگفت‌انگیز
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#181615]">
+                  لوازم جانبی تخفیف‌دار ویژه آلِرضا ({toPersianDigits(discountedProducts.length)} کالا)
+                </h3>
+              </div>
+              <span className="text-xs text-[#6E675F]">
+                تخفیف‌های ویژه با زمان و تعداد محدود
+              </span>
+            </div>
+
+            {discountedProducts.length === 0 ? (
+              <div className="rounded-2xl bg-white border border-[#E6DFD3] p-8 text-center">
+                <p className="text-sm font-bold text-[#6E675F]">
+                  در حال حاضر محصولی در لیست تخفیف ویژه قرار ندارد.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {discountedProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    category={categories.find((c) => c.id === product.categoryId)}
+                    isFeaturedDiscount={true}
+                    onSelectProduct={(p) => setSelectedProductDetail(p)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
         {/* =========================================================
