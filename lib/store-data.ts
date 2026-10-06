@@ -379,3 +379,31 @@ export function resolveAssetUrl(url: string): string {
   }
   return url;
 }
+
+/**
+ * Automatically caches any image viewed by the user into persistent CacheStorage
+ * to eliminate repeated downloads and save user's internet bandwidth.
+ */
+export function cacheImageResource(url: string | undefined | null) {
+  if (typeof window === 'undefined' || !('caches' in window) || !url || typeof url !== 'string') return;
+  if (url.startsWith('data:') || url.startsWith('blob:')) return;
+  try {
+    const resolved = resolveAssetUrl(url);
+    window.caches.open('aleraza-images-cache-v2').then(async (cache) => {
+      const match = await cache.match(resolved);
+      if (!match) {
+        const isExternal = resolved.startsWith('http') && !resolved.startsWith(window.location.origin);
+        const req = new Request(resolved, {
+          mode: isExternal ? 'no-cors' : 'same-origin',
+          cache: 'force-cache',
+        });
+        const res = await fetch(req);
+        if (res && (res.status === 200 || res.type === 'opaque')) {
+          await cache.put(resolved, res);
+        }
+      }
+    }).catch(() => {});
+  } catch {
+    // Ignore cache errors in private mode
+  }
+}

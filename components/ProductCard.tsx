@@ -18,6 +18,7 @@ import {
   toPersianDigits,
   calcDiscountPercent,
   resolveAssetUrl,
+  cacheImageResource,
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
 
@@ -68,16 +69,16 @@ export function ProductCard({
           : 'bg-[#FFFFFF] border-[#E6DFD3] shadow-[0_8px_24px_-12px_rgba(24,22,21,0.07)] hover:border-[#C85A32]/40 hover:shadow-[0_16px_36px_-12px_rgba(24,22,21,0.13)]'
       }`}
     >
-      {/* Multi-Image Interactive Carousel Area (All slides pre-mounted in DOM for instant cached switching) */}
+      {/* Multi-Image Interactive Carousel Area (Lazy loaded & automatically cached on view) */}
       <div className="relative aspect-[4/3] w-full bg-[#F3EFE6] overflow-hidden select-none">
         {visibleImages.map((imgUrl, idx) => (
           <img
             key={`${product.id}-slide-${idx}`}
             src={resolveAssetUrl(imgUrl)}
             alt={`${product.title} - تصویر ${idx + 1}`}
-            loading="eager"
+            loading="lazy"
             decoding="async"
-            fetchPriority={isFeaturedDiscount && idx === 0 ? 'high' : 'auto'}
+            onLoad={() => cacheImageResource(imgUrl)}
             onClick={() => onSelectProduct(product)}
             className={`absolute inset-0 h-full w-full object-cover object-center transition-all duration-300 group-hover:scale-105 cursor-pointer ${
               idx === safeSlideIndex
@@ -205,6 +206,9 @@ export function ProductCard({
               <img
                 src={resolveAssetUrl(imgUrl)}
                 alt=""
+                loading="lazy"
+                decoding="async"
+                onLoad={() => cacheImageResource(imgUrl)}
                 className="h-full w-full object-cover"
               />
             </button>

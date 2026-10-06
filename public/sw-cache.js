@@ -66,6 +66,7 @@ function isImageRequest(request, url) {
   return /\.(jpe?g|png|webp|avif|gif|svg|ico)(\?.*)?$/i.test(url.pathname);
 }
 
+// Intercept all network fetches: Cache-First for both Images & Fonts
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -98,7 +99,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Cache-First with Background Revalidation for Product & Hero Images
+  // 2. Cache-First Strategy for ALL Viewed Images (Instant 0-bandwidth reload)
   if (isImageRequest(request, url)) {
     event.respondWith(
       caches.open(IMAGE_CACHE_NAME).then(async (cache) => {
@@ -142,7 +143,7 @@ self.addEventListener('message', (event) => {
               }
             }
           } catch {
-            // Ignore individual image fetch errors
+            // Ignore individual fetch errors
           }
         }
       })

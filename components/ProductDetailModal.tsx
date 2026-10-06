@@ -18,6 +18,7 @@ import {
   toPersianDigits,
   calcDiscountPercent,
   resolveAssetUrl,
+  cacheImageResource,
 } from '@/lib/store-data';
 import { useStore } from './StoreProvider';
 
@@ -66,8 +67,9 @@ export function ProductDetailModal({
                 key={`${product.id}-modal-slide-${idx}`}
                 src={resolveAssetUrl(imgUrl)}
                 alt={`${product.title} - تصویر ${idx + 1}`}
-                loading="eager"
+                loading="lazy"
                 decoding="async"
+                onLoad={() => cacheImageResource(imgUrl)}
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ${
                   idx === safeSlide ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none z-0'
                 }`}
@@ -120,7 +122,14 @@ export function ProductDetailModal({
                     : 'border-transparent opacity-65 hover:opacity-100'
                 }`}
               >
-                <img src={resolveAssetUrl(img)} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={resolveAssetUrl(img)}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  onLoad={() => cacheImageResource(img)}
+                  className="h-full w-full object-cover"
+                />
               </button>
             ))}
           </div>

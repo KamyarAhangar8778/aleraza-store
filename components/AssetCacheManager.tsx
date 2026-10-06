@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 import { useStore } from './StoreProvider';
 import { PRESET_APPLIANCE_GALLERY, resolveAssetUrl } from '@/lib/store-data';
 
-export const FONT_CACHE_NAME = 'aleraza-fonts-cache-v1';
-export const IMAGE_CACHE_NAME = 'aleraza-images-cache-v1';
+export const FONT_CACHE_NAME = 'aleraza-fonts-cache-v2';
+export const IMAGE_CACHE_NAME = 'aleraza-images-cache-v2';
 
 export async function warmUpBrowserAssetCache(imageUrls: string[]) {
   if (typeof window === 'undefined') return { cachedImages: 0, cachedFonts: 0 };

@@ -20,7 +20,13 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
-import { Product, toPersianDigits, calcDiscountPercent, resolveAssetUrl } from '@/lib/store-data';
+import {
+  Product,
+  toPersianDigits,
+  calcDiscountPercent,
+  resolveAssetUrl,
+  cacheImageResource,
+} from '@/lib/store-data';
 import { ProductCard } from '@/components/ProductCard';
 import { AuthModal } from '@/components/AuthModal';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
@@ -312,6 +318,9 @@ export default function AlerazaLandingPage() {
                   <img
                     src={resolveAssetUrl('/images/hero_appliance_accessories.jpg')}
                     alt="لوازم جانبی و قطعات اورجینال لوازم خانگی آلِرضا"
+                    loading="eager"
+                    decoding="async"
+                    onLoad={() => cacheImageResource('/images/hero_appliance_accessories.jpg')}
                     className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#181615] via-[#181615]/40 to-transparent lg:block hidden" />
@@ -403,6 +412,9 @@ export default function AlerazaLandingPage() {
                 <img
                   src={resolveAssetUrl('/images/hero_appliance_accessories.jpg')}
                   alt="همه دسته‌ها"
+                  loading="lazy"
+                  decoding="async"
+                  onLoad={() => cacheImageResource('/images/hero_appliance_accessories.jpg')}
                   className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -445,6 +457,9 @@ export default function AlerazaLandingPage() {
                     <img
                       src={resolveAssetUrl(catImg)}
                       alt={cat.name}
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={() => cacheImageResource(catImg)}
                       className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
