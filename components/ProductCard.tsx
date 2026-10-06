@@ -281,21 +281,27 @@ export function ProductCard({
                     {toPersianDigits(discountPercent)}٪-
                   </span>
                 </div>
-                <div className="mt-0.5 flex items-baseline gap-1">
+                <div className="mt-0.5 flex items-center gap-1.5">
                   <span className="text-xl font-extrabold text-[#181615] tracking-tight">
                     {formatToman(product.discountedPrice)}
                   </span>
-                  <span className="text-xs font-medium text-[#6E675F]">تومان</span>
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#C85A32] shadow-[0_1px_2px_rgba(0,0,0,0.04)] select-none">
+                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
+                    تومان
+                  </span>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col">
                 <span className="text-[11px] text-[#6E675F]">قیمت مصرف‌کننده:</span>
-                <div className="mt-0.5 flex items-baseline gap-1">
+                <div className="mt-0.5 flex items-center gap-1.5">
                   <span className="text-xl font-extrabold text-[#181615] tracking-tight">
                     {formatToman(product.price)}
                   </span>
-                  <span className="text-xs font-medium text-[#6E675F]">تومان</span>
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-1.5 py-0.5 text-[10px] font-black tracking-tighter text-[#C85A32] shadow-[0_1px_2px_rgba(0,0,0,0.04)] select-none">
+                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
+                    تومان
+                  </span>
                 </div>
               </div>
             )}

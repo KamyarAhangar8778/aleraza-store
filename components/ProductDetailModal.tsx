@@ -201,15 +201,25 @@ export function ProductDetailModal({
                   <div className="text-xs text-[#8C837A] line-through">
                     قیمت قبل از تخفیف: {formatToman(product.price)} تومان
                   </div>
-                  <div className="text-2xl font-black text-[#D92D20] mt-0.5">
-                    {formatToman(product.discountedPrice)}{' '}
-                    <span className="text-xs font-bold text-[#181615]">تومان</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-2xl font-black text-[#D92D20]">
+                      {formatToman(product.discountedPrice)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-2 py-0.5 text-[11px] font-black tracking-tighter text-[#C85A32] shadow-xs select-none">
+                      <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
+                      تومان
+                    </span>
                   </div>
                 </>
               ) : (
-                <div className="text-2xl font-black text-[#181615]">
-                  {formatToman(product.price)}{' '}
-                  <span className="text-xs font-bold text-[#6E675F]">تومان</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-[#181615]">
+                    {formatToman(product.price)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[#F3EFE6] border border-[#C85A32]/35 px-2 py-0.5 text-[11px] font-black tracking-tighter text-[#C85A32] shadow-xs select-none">
+                    <span className="h-1.5 w-1.5 rotate-45 rounded-[0.5px] bg-[#C85A32]" />
+                    تومان
+                  </span>
                 </div>
               )}
             </div>
