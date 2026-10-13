@@ -154,7 +154,6 @@ export default function AlerazaLandingPage() {
         totalCartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={logout}
       />
 
       {/* مدال‌ها و کشوهای کاربری */}
