@@ -1,114 +1,110 @@
-# معماری فنی سامانه (Technical Architecture)
+# معماری فنی سامانه (Technical Architecture & Developer Guide)
 
-سامانه فروشگاه آنلاین قطعات و لوازم خانگی **آلِرضا** یک برنامه وب فول‌استک مدرن بر بستر **Next.js 15 (App Router)**، **TypeScript**، **Tailwind CSS v4** و **Google Firebase (Firestore & Auth)** است.
+سامانه فروشگاه آنلاین قطعات و لوازم خانگی **آلِرضا** (`aleraza-store`) یک برنامه وب فول‌استک مدرن، مقیاس‌پذیر و واکنش‌گرا است که بر بستر **Next.js 15 (App Router)**، **TypeScript**، **Tailwind CSS** و **Google Firebase (Firestore & Auth)** توسعه یافته است.
+
+این مستند به عنوان راهنمای جامع برای توسعه‌دهندگان و **AI Agent Coder**ها تهیه شده است تا ساختار پروژه، مسئولیت فایل‌ها، الگوهای طراحی و نکات کلیدی توسعه را به طور دقیق تبیین کند.
 
 ---
 
-## ۱. مدل معماری و جریان داده (Architecture & Data Flow)
+## ۱. ساختار پوشه‌ها و نقشه فایل‌ها (Project Structure & File Roles)
 
-معماری سیستم از الگوی **Facade Composite State** پیروی می‌کند:
+پروژه به صورت کاملاً ماژولار، تمیز و ساختاریافته طراحی شده است تا نگهداری و گسترش آن برای هوش مصنوعی و انسان آسان باشد.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                       Next.js App Router                    │
-├──────────────────────────────┬──────────────────────────────┤
-│  Storefront (/app/page.tsx)  │   Admin Panel (/app/admin)   │
-│  - StoreHeader               │   - AdminSidebar             │
-│  - StoreHero                 │   - AdminHeader              │
-│  - SpecialOffersSection      │   - DashboardSection         │
-│  - StoreCategories           │   - ProductsSection          │
-│  - FeaturedProductsSection   │   - ProductFormSection       │
-│  - StorePillarsSection       │   - QuickPricingSection      │
-│  - StoreFooter               │   - CategoriesSection        │
-│  - Customer Modals           │   - CarouselsSection         │
-│                              │   - UsersSection             │
-└───────────────┬──────────────┴──────────────┬───────────────┘
-                │                             │
-                ▼                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│               StoreProvider & useStore() Hook               │
-├──────────────────────────────┬──────────────────────────────┤
-│       useStoreAuth.ts        │      useStoreProducts.ts     │
-│  - User authentication       │  - Products sync & CRUD      │
-│  - Session management        │  - Categories sync & CRUD    │
-│  - Phone credentials & OAuth │  - Quick pricing & Carousels │
-├──────────────────────────────┴──────────────────────────────┤
-│                      useStoreCart.ts                        │
-│  - Cart items & quantities                                  │
-│  - LocalStorage persistence                                 │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Firebase Cloud Services                   │
-│  - Firestore Collections: products, categories, users, etc. │
-│  - Firebase Auth: Google OAuth & Session Persistence        │
-└─────────────────────────────────────────────────────────────┘
+/
+├── app/                  # مسیریابی و صفحات اصلی (Next.js App Router)
+│   ├── layout.tsx        # روت لایوت سراسری (فونت Vazirmatn، پرووایدرها و ابرداده‌ها)
+│   ├── page.tsx          # صفحه اصلی ویترین فروشگاه (Storefront Orchestrator)
+│   ├── globals.css       # استایل‌های سراسری Tailwind CSS
+│   ├── not-found.tsx     # صفحه خطای 404 اختصاصی
+│   └── admin/
+│       └── page.tsx      # پنل مدیریت پیشرفته با تب‌بندی داینامیک
+├── components/           # کامپوننت‌های رابط کاربری (UI Components)
+│   ├── StoreProvider.tsx # پرووایدر مرکزی state و اتصال به فایربیس
+│   ├── AuthModal.tsx     # مدال ورود/ثبت‌نام مشتریان (موبایل/رمز و گوگل)
+│   ├── CartDrawer.tsx    # سبد خرید کشویی با محاسبه آنلاین تخفیف و مجموع
+│   ├── ProductCard.tsx   # کارت نمایش محصول با برچسب تخفیف و قیمت همکاری
+│   ├── ProductDetailModal.tsx # مدال جزئیات محصول، مشخصات فنی و گالری تصاویر
+│   ├── ToastBanner.tsx   # سیستم اعلان‌های شناور (Toast)
+│   ├── AssetCacheManager.tsx # مدیریت پیش‌گرمایش کش مرورگر و تصاویر
+│   ├── store/            # سکشن‌های ویترین فروشگاه
+│   │   ├── StoreHeader.tsx         # هدر بالای سایت (جستجو، سبد، حساب کاربری)
+│   │   ├── StoreHero.tsx           # بنر اصلی هیرو با اسلایدر و دسترسی سریع
+│   │   ├── SpecialOffersSection.tsx # پیشنهادهای شگفت‌انگیز و جشنواره تخفیف
+│   │   ├── StoreCategories.tsx     # دسته‌بندی‌های بصری قطعات (فیلتر، جارو، باریستا و...)
+│   │   ├── FeaturedProductsSection.tsx # محصولات ویژه و پرفروش
+│   │   ├── StorePillarsSection.tsx # مزیت‌های رقابتی (ضمانت اصالت، ارسال سریع و...)
+│   │   ├── StoreFooter.tsx         # فوتر جامع فروشگاه با نمادها و راهنما
+│   │   └── MobileBottomNav.tsx     # نویگیشن بار پایین صفحه برای موبایل
+│   └── admin/            # کامپوننت‌های پنل مدیریت
+│       ├── AdminHeader.tsx         # هدر پنل ادمین (خروج، وضعیت دسترسی)
+│       ├── AdminSidebar.tsx        # منوی کناری مدیریت (دسترسی به بخش‌های مختلف)
+│       ├── AdminLoginScreen.tsx    # صفحه ورود اختصاصی ادمین
+│       └── sections/               # بخش‌های مدیریت (Dashboard, Products, Categories, Users, etc.)
+│           ├── DashboardSection.tsx    # آمار کلیدی و وضعیت انبار
+│           ├── ProductsSection.tsx     # مدیریت کاتالوگ محصولات و قیمت همکاری
+│           ├── ProductFormSection.tsx  # فرم افزودن/ویرایش پیشرفته محصول
+│           ├── QuickPricingSection.tsx # بروزرسانی سریع قیمت‌ها و تخفیف‌ها
+│           ├── CategoriesSection.tsx   # مدیریت دسته‌بندی‌ها
+│           ├── CarouselsSection.tsx    # مدیریت اسلایدرهای صفحه اصلی
+│           ├── UsersSection.tsx        # مدیریت کاربران و تغییر نقش‌ها
+│           └── product-form/           # زیرکامپوننت‌های فرم محصول (گالری، قیمت‌گذاری، مشخصات)
+├── hooks/                # هوک‌های سفارشی بیزینس لاجیک
+│   ├── useStoreAuth.ts   # مدیریت احراز هویت، نشست‌ها و دایرکتوری کاربران فایربیس
+│   ├── useStoreProducts.ts # مدیریت همگام‌سازی لحظه‌ای محصولات و دسته‌بندی‌ها
+│   ├── useStoreCart.ts   # مدیریت سبد خرید و LocalStorage
+│   └── use-mobile.ts     # تشخیص ابعاد صفحه نمایش موبایل
+├── lib/                  # کتابخانه‌های کمکی و ابزارها
+│   ├── firebase.ts       # راه‌اندازی و اتصال به Firebase (Firestore & Auth)
+│   ├── image-utils.ts    # ابزار فشرده‌سازی تصویر در سمت کلاینت (Canvas)
+│   ├── store-data.ts     # داده‌های اولیه پیش‌فرض (دوموی محصولات و دسته‌ها)
+│   └── utils.ts          # توابع کمکی عمومی (Tailwind cn و غیره)
+└── public/               # دارایی‌های استاتیک، تصاویر و سرویس‌ورکر
+    └── sw-cache.js       # سرویس‌ورکر برای کش آفلاین و فونت‌ها
 ```
 
 ---
 
-## ۲. لایه‌های برنامه (System Layers)
+## ۲. معماری استیت و مدیریت داده (State & Business Logic Layer)
 
-### الف. لایه ارائه (Presentation Layer)
-- **`app/page.tsx` (Storefront Orchestrator):** هماهنگ‌کننده بخش‌های ویترین فروشگاه برای خریداران بدون درگیر شدن با جزئیات پیاده‌سازی.
-- **`app/admin/page.tsx` (Admin Orchestrator):** هماهنگ‌کننده پیشخوان مدیریت وردپرسی بر اساس متغیر `activeSection`.
-- **`components/store/`:** کامپوننت‌های اتمیک و سکشن‌های صفحه اصلی، شامل هدر، هیرو، ویترین تخفیف‌ها، کاتالوگ و فوتر.
-- **`components/admin/sections/`:** صفحات مستقل مدیریت محصولات، دسته‌بندی‌ها، اسلایدرها، کاربران و قیمت‌گذاری سریع.
+برای جلوگیری از تبدیل شدن کامپوننت‌ها به God Components، منطق بیزینس و مدیریت استیت به هوک‌های ماژولار تقسیم شده است که از طریق `StoreProvider` در کل اپلیکیشن سرویس‌دهی می‌شوند:
 
-### ب. لایه استیت و بیزنس لاجیک (State & Business Logic Layer)
-برای جلوگیری از تولید فایل‌های هیولایی (God Objects)، منطق سیستم به ۳ هوک ماژولار شکسته شده است:
-1. **`hooks/useStoreAuth.ts`:**
-   - مدیریت اطلاعات کاربر جاری (`currentUser`) و نشست محلی.
-   - ورود با شماره موبایل و رمز عبور (پشتیبانی از اعداد فارسی).
-   - ورود با حساب گوگل از طریق `signInWithPopup`.
-   - شنود لحظه‌ای کالکشن `users_directory` در فایربیس.
-2. **`hooks/useStoreProducts.ts`:**
-   - شنود بلادرنگ کالکشن‌های `products` و `categories`.
-   - عملیات خوش‌بینانه (Optimistic Updates) در رابط کاربری قبل از پاسخ سرور.
-   - توابع بازنشانی اطلاعات نمونه دمو (`resetToDemoData`).
-   - ذخیره تغییرات قیمت و اسلایدرها.
-3. **`hooks/useStoreCart.ts`:**
-   - نگهداری اقلام انتخابی کاربر در سبد خرید.
-   - همگام‌سازی خودکار با `localStorage`.
-   - محاسبات قیمت کل، تخفیف‌ها و تعداد اقلام.
+1. **`useStoreAuth.ts`:**
+   - مدیریت نشست کاربر (`currentUser`) و نگهداری در `localStorage` و فایربیس.
+   - احراز هویت با شماره تلفن / رمز عبور (پشتیبانی از اعداد فارسی).
+   - ورود سریع با حساب گوگل (`signInWithPopup`).
+   - شنود بلادرنگ کالکشن `users_directory` در فایربیس.
 
-### ج. لایه کش و عملکرد (Performance & Caching Layer)
-- **`public/sw-cache.js`:** سرویس‌ورکر اختصاصی جهت کش دائمی فونت‌های فارسی (Vazirmatn WOFF2) و تصاویر با استراتژی Cache-First.
-- **`components/AssetCacheManager.tsx`:** ابزار پیش‌گرمایش حافظه پنهان مرورگر (`warmUpBrowserAssetCache`) جهت لود آنی تصاویر کاروسل.
-- **`lib/image-utils.ts`:** تابع `compressImageFile` برای فشرده‌سازی در سمت کلاینت با بوم Canvas قبل از ارسال تصویر به دیتابیس.
+2. **`useStoreProducts.ts`:**
+   - اتصال زنده به کالکشن‌های `products`، `categories`، `carousels` و `settings` در Firestore.
+   - پشتیبانی از عملیات CRUD کامل برای مدیران.
+   - مکانیزم بازنشانی به داده‌های نمونه پیش‌فرض (`resetToDemoData`).
+   - پشتیبانی از قیمت همکار (Wholesale) و حداقل تعداد خرید عمده.
+
+3. **`useStoreCart.ts`:**
+   - سبد خرید پیشرفته با قابلیت افزودن، کاهش، حذف و محاسبه خودکار تخفیف‌ها.
+   - همگام‌سازی دائمی با `localStorage` برای حفظ سبد کاربر پس از رفرش.
 
 ---
 
-## ۳. مدل‌های داده (Data Schemas)
+## ۳. لایه پایگاه داده و فایربیس (Firebase Integration)
 
-### محصول (`Product`)
-- `id`: شناسه یکتا
-- `title`: نام فارسی محصول
-- `subtitle`: توضیح فنی و ویژگی‌های برجسته
-- `categoryId`: شناسه دسته‌بندی مرتبط
-- `price`: قیمت عادی به تومان
-- `discountedPrice`: قیمت پس از اعمال تخفیف
-- `isDiscounted`: وضعیت نمایش در جشنواره و ویترین اول صفحه
-- `wholesalePrice`: قیمت همکاری یا قیمت عمده (ویژه مشتریان عضو ثبت‌شده توسط ادمین)
-- `wholesaleMinQty`: حداقل تعداد خرید برای اعمال قیمت همکاری
-- `images`: آرایه‌ای از آدرس تصاویر کاروسل
-- `maxCarouselImages`: حداکثر تعداد اسلایدهای فعال در کاروسل
-- `features`: لیست مشخصات فنی
-- `stock`: موجودی انبار
+پروژه از **Google Firestore** برای ذخیره‌سازی ابری داده‌ها و از **Firebase Authentication** برای ورود کاربران و ادمین‌ها بهره می‌برد.
+- فایل تنظیمات اتصال: `lib/firebase.ts`
+- قوانین دسترسی امنیتی: `firestore.rules`
+- قابلیت خودکار همگام‌سازی داده‌های نمونه در صورت خالی بودن دیتابیس.
 
-### دسته‌بندی (`Category`)
-- `id`: شناسه یکتا
-- `name`: نام دسته‌بندی
-- `slug`: نامک انگلیسی مناسب URL
-- `description`: شرح مختصر
-- `imageUrl`: تصویر شاخص دسته
-- `order`: اولویت چیدمان در فروشگاه
+---
 
-### کاربر (`UserAccount`)
-- `id`: شناسه یکتا
-- `fullName`: نام و نام خانوادگی
-- `phone`: شماره تلفن همراه (نام کاربری ورود)
-- `password`: رمز عبور
-- `role`: نقش کاربر (`admin` یا `customer`)
-- `email`: ایمیل (در صورت ورود با گوگل)
+## ۴. نکات کلیدی برای توسعه‌دهندگان و AI Coderها
+
+هر AI Agent که روی این پروژه کار می‌کند باید اصول زیر را رعایت کند:
+
+1. **حفظ معماری ماژولار:** از انباشتن کدها در `page.tsx` خودداری کنید؛ منطق جدید را در هوک‌ها و کامپوننت‌های تخصصی داخل `components/` قرار دهید.
+2. **کاهش پیچیدگی (Simplicity First):** کدهای اضافه، over-engineering و منطق غیرضروری اضافه نکنید. طبق قوانین پروژه، سادگی و خوانایی مقدم بر هر چیز است.
+3. **پشتیبانی کامل از زبان فارسی و RTL:** تمام متن‌ها، عناوین و واحدهای پولی (تومان با کامپوننت `TomanIcon`) باید کاملاً به زبان فارسی و سازگار با رابط کاربری فروشگاهی باشد.
+4. **مدیریت خطای فایربیس:** هنگام کار با Firestore، همیشه حالت‌های بارگذاری (`loading`) و خطاهای احتمالی شبکه را مدیریت کنید.
+5. **بررسی صحت ساختار بعد از تغییر:** پس از هر تغییر، حتماً کامپایل و لنت پروژه (`npm run lint` / `npm run build`) را بررسی کنید.
+
+---
+*این مستند همزمان با تکامل پروژه به روزرسانی می‌شود.*
