@@ -1,0 +1,72 @@
+/*
+Theme Name: Aleraza Store
+Description: قالب اختصاصی و سبک فروشگاه آلِرضا بر پایه WordPress و WooCommerce؛ بدون وابستگی به صفحه‌ساز.
+Version: 0.1.0
+Requires at least: 6.9
+Requires PHP: 8.3
+Text Domain: aleraza-store
+*/
+
+:root {
+  color-scheme: light;
+  --aleraza-bg: #faf7f2;
+  --aleraza-surface: #ffffff;
+  --aleraza-text: #181615;
+  --aleraza-muted: #706b66;
+  --aleraza-border: #e9e2d9;
+  --aleraza-accent: #a4472c;
+  --aleraza-radius: 1.25rem;
+  --aleraza-content-width: 1200px;
+}
+
+* { box-sizing: border-box; }
+html { direction: rtl; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--aleraza-bg);
+  color: var(--aleraza-text);
+  font-family: Tahoma, Arial, sans-serif;
+  line-height: 1.8;
+}
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--aleraza-accent); }
+img { max-width: 100%; height: auto; }
+button, input, select, textarea { font: inherit; }
+.aleraza-container { width: min(calc(100% - 2rem), var(--aleraza-content-width)); margin-inline: auto; }
+.aleraza-header { background: var(--aleraza-surface); border-bottom: 1px solid var(--aleraza-border); }
+.aleraza-header__inner { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.aleraza-brand { font-size: 1.25rem; font-weight: 800; }
+.aleraza-nav ul { display: flex; align-items: center; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+.aleraza-header__actions { display: flex; align-items: center; gap: .75rem; }
+.aleraza-button { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: .6rem 1rem; border: 1px solid var(--aleraza-border); border-radius: 999px; background: var(--aleraza-surface); font-weight: 700; }
+.aleraza-button--primary { background: var(--aleraza-accent); border-color: var(--aleraza-accent); color: #fff; }
+.aleraza-main { min-height: 60vh; }
+.aleraza-hero { padding-block: clamp(3rem, 8vw, 6rem); }
+.aleraza-hero__panel { padding: clamp(1.5rem, 5vw, 4rem); border-radius: calc(var(--aleraza-radius) * 1.5); background: #efe5d9; }
+.aleraza-eyebrow { color: var(--aleraza-accent); font-weight: 800; }
+.aleraza-hero h1 { max-width: 720px; margin: .5rem 0 1rem; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.25; letter-spacing: -.04em; }
+.aleraza-hero p { max-width: 620px; color: var(--aleraza-muted); }
+.aleraza-section { padding-block: 2rem 4rem; }
+.aleraza-section__heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.aleraza-section__heading h2 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); }
+.aleraza-products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.aleraza-product { overflow: hidden; padding: 1rem; border: 1px solid var(--aleraza-border); border-radius: var(--aleraza-radius); background: var(--aleraza-surface); }
+.aleraza-product__image { display: grid; place-items: center; aspect-ratio: 1 / 1; overflow: hidden; border-radius: .85rem; background: #f5f1eb; }
+.aleraza-product__image img { width: 100%; height: 100%; object-fit: contain; }
+.aleraza-product h3 { margin: .9rem 0 .5rem; font-size: 1rem; line-height: 1.6; }
+.aleraza-product__price { font-weight: 800; }
+.aleraza-empty { padding: 1.5rem; border: 1px dashed var(--aleraza-border); border-radius: var(--aleraza-radius); color: var(--aleraza-muted); }
+.aleraza-footer { margin-top: 3rem; padding-block: 2rem; border-top: 1px solid var(--aleraza-border); color: var(--aleraza-muted); }
+.aleraza-footer__inner { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .aleraza-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .aleraza-nav { display: none; }
+}
+@media (max-width: 480px) {
+  .aleraza-container { width: min(calc(100% - 1.25rem), var(--aleraza-content-width)); }
+  .aleraza-header__inner { min-height: 64px; }
+  .aleraza-header__actions .aleraza-button:not(.aleraza-button--primary) { display: none; }
+  .aleraza-products { gap: .65rem; }
+  .aleraza-product { padding: .65rem; }
+}
