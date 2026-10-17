@@ -260,3 +260,15 @@ package.json شامل dev، build، start و lint است و وابستگی Fireb
 ### Verification
 - این تغییر فقط سند Plan را به‌روزرسانی می‌کند؛ هیچ تغییری در برنامه یا دیتابیس انجام نشده است.
 - هنوز build، lint، نصب WordPress یا تست integration اجرا نشده‌اند.
+
+
+## 14. اصلاح وضعیت زیرساخت پیش از خرید (2026-10-17)
+
+- کاربر هنوز هاست یا دامنه نخریده است؛ WordPress نیز نصب نشده و وضعیت ثبت فروشگاه در ترب نامشخص است. بنابراین هنوز امکان بررسی واقعی PHP/DB، تنظیمات وب‌سرور، مسیرها یا اتصال ترب وجود ندارد.
+- عبارت «هاست بدون Node.js و مناسب PHP/WordPress» محدودیت هدف معماری است، نه مشخصات یک هاست خریداری‌شده.
+- پیش از خرید باید معماری را با proof-of-concept محلی بررسی کنیم: (الف) Next.js static export با HTML مستقل برای صفحات محصول، یا (ب) رابط اختصاصی کدنویسی‌شده در قالب سبک WordPress/WooCommerce بدون الزام Elementor. هر دو گزینه می‌توانند UI اختصاصی داشته باشند؛ گزینهٔ اول محدودیت‌های static export را دارد.
+- برای static export، Next.js از قابلیت‌های runtime مثل cookies، headers، rewrites، redirects و Server Actions پشتیبانی نمی‌کند. مستند رسمی: https://nextjs.org/docs/app/guides/static-exports
+- هنگام انتخاب هاست، requirements جاری WordPress/WooCommerce را دوباره بررسی کنیم و HTTPS، دیتابیس MySQL/MariaDB، نسخهٔ PHP پشتیبانی‌شده، backup و دسترسی لازم به فایل‌ها/مسیرها را تأیید کنیم. مراجع: https://developer.wordpress.org/advanced-administration/before-install/ و https://developer.woocommerce.com/2026/09/29/php-8-1-requirement/
+- افزونهٔ رسمی ترب برای WooCommerce موجود است: https://wordpress.org/plugins/products-extractor-for-woocommerce/؛ پس از نصب WooCommerce در staging آزمایش شود. فعلاً افزونهٔ اختصاصی نسازیم مگر نیاز پوشش‌داده‌نشده‌ای اثبات شود.
+- پیشنهاد فعلی: ابتدا معماری را بررسی کنیم و سپس دامنه/هاست سازگار انتخاب شود، نه اینکه بعد از خرید زیرساخت به معماری تحمیل شود.
+- این به‌روزرسانی فقط مستند است؛ کد، تنظیمات برنامه و داده‌ها تغییر نکرده‌اند. نصب وردپرس، build و اتصال ترب انجام نشده‌اند.
