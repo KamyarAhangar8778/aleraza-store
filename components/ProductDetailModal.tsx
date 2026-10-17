@@ -23,6 +23,7 @@ import {
 import { useStore } from './StoreProvider';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 import { Toman } from './TomanIcon';
+import { WarrantyIcon } from './WarrantyIcon';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -35,7 +36,7 @@ export function ProductDetailModal({
   category,
   onClose,
 }: ProductDetailModalProps) {
-  const { addToCart } = useStore();
+  const { addToCart, currentUser } = useStore();
   const [activeSlide, setActiveSlide] = useState(0);
 
   if (!product) return null;
@@ -157,8 +158,13 @@ export function ProductDetailModal({
           <div>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <span className="rounded-lg bg-[#C85A32]/15 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold text-[#C85A32]">
-                {category ? category.name : 'لوازم خانگی آلِرضا'}
+                {category ? category.name : 'قطعات لوازم خانگی آل رضا'}
               </span>
+              {product.badge && (
+                <span className="inline-flex items-center rounded-lg bg-[#181615] px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-white shadow-xs">
+                  {product.badge}
+                </span>
+              )}
               {product.isDiscounted && discountPercent > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-lg bg-[#D92D20] px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-bold text-white">
                   <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -175,10 +181,12 @@ export function ProductDetailModal({
             </p>
 
             {/* Warranty */}
-            <div className="mt-3 sm:mt-4 flex items-center gap-2 rounded-xl bg-[#1F6E58]/10 border border-[#1F6E58]/25 px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs font-bold text-[#1F6E58]">
-              <ShieldCheck className="w-4 h-4 flex-shrink-0" />
-              <span>{product.warranty}</span>
-            </div>
+            {product.warranty && (
+              <div className="mt-3 sm:mt-4 flex items-center gap-2 rounded-xl bg-[#1F6E58]/10 border border-[#1F6E58]/25 px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs font-bold text-[#1F6E58]">
+                <WarrantyIcon iconName={product.warrantyIcon} className="w-4 h-4 flex-shrink-0 text-[#1F6E58]" />
+                <span>{product.warranty}</span>
+              </div>
+            )}
 
             {/* Technical Specs List */}
             {product.features && product.features.length > 0 && (
@@ -201,31 +209,69 @@ export function ProductDetailModal({
             )}
           </div>
 
-          {/* Sticky Purchase Action Bar on mobile */}
-          <div className="mt-5 sm:mt-8 pt-3 sm:pt-5 border-t border-[#E6DFD3] space-y-3 sticky bottom-0 bg-[#FAF7F2]/95 backdrop-blur-md pb-3 sm:pb-0">
-            <div>
-              {product.isDiscounted && product.discountedPrice < product.price ? (
-                <>
-                  <div className="flex items-center gap-1 text-[11px] sm:text-xs text-[#8C837A]">
-                    <span>قیمت قبل از تخفیف:</span>
-                    <span className="line-through">{formatToman(product.price)}</span>
-                    <Toman className="text-[10px] text-[#8C837A]" />
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xl sm:text-2xl font-black text-[#D92D20]">
+          {/* Sticky Purchase Action Bar */}
+          <div className="mt-5 sm:mt-6 pt-3 sm:pt-4 border-t border-[#E6DFD3] space-y-3 sticky bottom-0 bg-[#FAF7F2]/95 backdrop-blur-md pb-3 sm:pb-0">
+            {/* مقایسه قیمت معمولی و قیمت همکاری/عمده */}
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-xs font-bold text-[#6E675F]">قیمت معمولی:</span>
+                {product.isDiscounted && product.discountedPrice < product.price ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[#8C837A] line-through">
+                      {formatToman(product.price)}
+                    </span>
+                    <span className="text-sm sm:text-lg font-black text-[#D92D20]">
                       {formatToman(product.discountedPrice)}
                     </span>
-                    <Toman className="text-xs text-[#8C837A] font-medium" />
+                    <Toman className="text-xs text-[#8C837A]" />
                   </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span className="text-xl sm:text-2xl font-black text-[#181615]">
-                    {formatToman(product.price)}
-                  </span>
-                  <Toman className="text-xs text-[#8C837A] font-medium" />
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm sm:text-lg font-black text-[#181615]">
+                      {formatToman(product.price)}
+                    </span>
+                    <Toman className="text-xs text-[#8C837A]" />
+                  </div>
+                )}
+              </div>
+
+              {product.wholesalePrice && product.wholesalePrice > 0 ? (
+                <div
+                  className={`p-3 rounded-2xl transition ${
+                    currentUser
+                      ? 'bg-[#1F6E58]/10 border border-[#1F6E58]/30 text-[#1F6E58]'
+                      : 'bg-[#F3EFE6] border border-[#E6DFD3] text-[#504C46]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 font-bold text-xs sm:text-sm">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-current shrink-0" />
+                      <span>قیمت همکاری یا قیمت عمده:</span>
+                    </span>
+                    <div className="flex items-center gap-1 font-black text-base sm:text-lg">
+                      <span>{formatToman(product.wholesalePrice)}</span>
+                      <Toman className="text-xs text-current" />
+                    </div>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[11px] opacity-90">
+                    <span>
+                      برای تعداد بالای{' '}
+                      <strong className="underline decoration-current">
+                        {toPersianDigits(product.wholesaleMinQty || 5)} عدد
+                      </strong>
+                    </span>
+                    {currentUser ? (
+                      <span className="font-extrabold text-[#1F6E58] bg-[#1F6E58]/15 px-2 py-0.5 rounded-md text-[10px]">
+                        فعال برای حساب شما
+                      </span>
+                    ) : (
+                      <span className="text-[#C85A32] font-bold text-[10px]">
+                        ویژه مشتریان عضو آلِرضا
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
+              ) : null}
             </div>
 
             <button

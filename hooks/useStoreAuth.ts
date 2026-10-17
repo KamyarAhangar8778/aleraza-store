@@ -1,25 +1,31 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   collection,
   doc,
   onSnapshot,
   setDoc,
   deleteDoc,
-  writeBatch,
 } from 'firebase/firestore';
-import { signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from 'firebase/auth';
-import { db, auth, googleProvider } from '@/lib/firebase';
-import { UserAccount, INITIAL_USERS, normalizePhone } from '@/lib/store-data';
+import { signOut as fbSignOut } from 'firebase/auth';
+import { db, auth } from '@/lib/firebase';
+import {
+  UserAccount,
+  MASTER_ADMIN,
+  MASTER_ADMIN_PHONE,
+  normalizePhone,
+} from '@/lib/store-data';
 
 const SESSION_STORAGE_KEY = 'aleraza_active_user_v1';
+const OBSOLETE_USER_IDS = ['user-admin-default', 'user-customer-sample'];
+const OBSOLETE_USER_PHONES = ['09120000000', '09121112233'];
 
 /**
  * هوک ماژولار مدیریت احراز هویت، کاربران، نشست کاربر جاری و همگام‌سازی فایربیس
  */
 export function useStoreAuth(showToast: (msg: string) => void) {
-  const [users, setUsers] = useState<UserAccount[]>(INITIAL_USERS);
+  const [users, setUsers] = useState<UserAccount[]>([MASTER_ADMIN]);
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
     if (typeof window === 'undefined') return null;
     try {
@@ -29,63 +35,67 @@ export function useStoreAuth(showToast: (msg: string) => void) {
       return null;
     }
   });
-  const isGooglePendingRef = useRef(false);
 
-  // شنود و همگام‌سازی پایگاه داده کاربران از Firestore
+  // شنود و همگام‌سازی پایگاه داده کاربران از Firestore و پاکسازی کاربرهای تستی قدیمی
   useEffect(() => {
     const unsubUsers = onSnapshot(
       collection(db, 'users_directory'),
       async (snapshot) => {
-        if (snapshot.empty) {
-          try {
-            const batch = writeBatch(db);
-            for (const usr of INITIAL_USERS) {
-              batch.set(doc(db, 'users_directory', usr.id), usr);
-            }
-            await batch.commit();
-          } catch {
-            // ignore seed errors
+        const rawList = snapshot.docs.map((d) => {
+          const data = d.data() as UserAccount;
+          return {
+            ...data,
+            id: d.id,
+          };
+        });
+
+        // ۱. پاکسازی همیشگی کاربرهای دیفالت نمونه از دیتابیس (سارا محمدی و ادمین تستی قدیمی)
+        for (const docSnap of snapshot.docs) {
+          const data = docSnap.data() as UserAccount;
+          const cleanP = normalizePhone(data.phone || '');
+          if (
+            OBSOLETE_USER_IDS.includes(docSnap.id) ||
+            OBSOLETE_USER_PHONES.includes(cleanP)
+          ) {
+            deleteDoc(doc(db, 'users_directory', docSnap.id)).catch(() => {});
           }
-          setUsers(INITIAL_USERS);
-        } else {
-          const list = snapshot.docs.map((d) => d.data() as UserAccount);
-          setUsers(list);
-          setCurrentUser((prev) => {
-            if (!prev) return null;
-            const updated = list.find((u) => u.id === prev.id);
-            return updated || prev;
-          });
         }
+
+        // ۲. اطمینان از وجود همیشگی مدیر کل اصلی (کاوه آهنگر) در دیتابیس
+        const hasMasterAdmin = rawList.some(
+          (u) =>
+            normalizePhone(u.phone) === normalizePhone(MASTER_ADMIN_PHONE) ||
+            u.id === MASTER_ADMIN.id
+        );
+        if (!hasMasterAdmin) {
+          setDoc(doc(db, 'users_directory', MASTER_ADMIN.id), MASTER_ADMIN).catch(() => {});
+        }
+
+        // ۳. ساخت لیست نهایی کاربران فیلترشده
+        const filtered = rawList.filter(
+          (u) =>
+            !OBSOLETE_USER_IDS.includes(u.id) &&
+            !OBSOLETE_USER_PHONES.includes(normalizePhone(u.phone || ''))
+        );
+
+        if (!filtered.some((u) => normalizePhone(u.phone) === normalizePhone(MASTER_ADMIN_PHONE))) {
+          filtered.unshift(MASTER_ADMIN);
+        }
+
+        setUsers(filtered);
+        setCurrentUser((prev) => {
+          if (!prev) return null;
+          const updated = filtered.find((u) => u.id === prev.id);
+          return updated || prev;
+        });
       },
       (error) => {
         console.error('Firestore users error:', error);
       }
     );
 
-    // همگام‌سازی وضعیت احراز هویت گوگل
-    const unsubAuth = onAuthStateChanged(auth, (fbUser) => {
-      if (fbUser && fbUser.email) {
-        const isOwner = fbUser.email.toLowerCase() === 'kavehahangar8778@gmail.com';
-        const googleAccount: UserAccount = {
-          id: `google-${fbUser.uid}`,
-          fullName: fbUser.displayName || 'مدیر آلِرضا',
-          phone: fbUser.phoneNumber || '09120000000',
-          password: 'google-oauth-user',
-          role: isOwner ? 'admin' : 'customer',
-          email: fbUser.email,
-          createdAt: new Date().toISOString(),
-          createdBy: 'google',
-        };
-        setCurrentUser(googleAccount);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(googleAccount));
-        }
-      }
-    });
-
     return () => {
       unsubUsers();
-      unsubAuth();
     };
   }, []);
 
@@ -163,56 +173,6 @@ export function useStoreAuth(showToast: (msg: string) => void) {
   /**
    * ورود با حساب گوگل و ثبت خودکار در فهرست کاربران
    */
-  const loginWithGoogle = async (): Promise<{ ok: boolean; error?: string }> => {
-    if (isGooglePendingRef.current) {
-      return { ok: false, error: 'درخواست ورود در حال پردازش است...' };
-    }
-    isGooglePendingRef.current = true;
-    try {
-      const res = await signInWithPopup(auth, googleProvider);
-      const fbUser = res.user;
-      const newUser: UserAccount = {
-        id: `google-${fbUser.uid}`,
-        fullName: fbUser.displayName || 'مدیر آلِرضا',
-        phone: fbUser.phoneNumber || '09120000000',
-        password: 'google-oauth-user',
-        role: 'admin',
-        email: fbUser.email || '',
-        createdAt: new Date().toISOString(),
-        createdBy: 'google',
-      };
-      await setDoc(doc(db, 'users_directory', newUser.id), newUser);
-      setCurrentUser(newUser);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
-      }
-      showToast(`${newUser.fullName} عزیز، با حساب گوگل وارد شدید.`);
-      return { ok: true };
-    } catch (e: unknown) {
-      const err = e as { code?: string; message?: string };
-      const code = err?.code || '';
-      let errorMsg = 'ورود با گوگل انجام نشد. می‌توانید با شماره موبایل و رمز عبور وارد شوید.';
-      if (code === 'auth/popup-blocked') {
-        errorMsg = 'مرورگر پنجره پاپ‌آپ گوگل را مسدود کرد. لطفاً پاپ‌آپ را در نوار آدرس مجاز کنید یا با شماره و رمز وارد شوید.';
-        console.warn('Google sign in: popup blocked by browser/iframe.');
-      } else if (code === 'auth/cancelled-popup-request') {
-        errorMsg = 'درخواست ورود پاپ‌آپ لغو شد.';
-        console.warn('Google sign in: popup request cancelled.');
-      } else if (code === 'auth/popup-closed-by-user') {
-        errorMsg = 'پنجره ورود توسط کاربر بسته شد.';
-        console.warn('Google sign in: popup closed by user.');
-      } else {
-        console.warn('Google sign in notice:', err?.message || err);
-      }
-      return {
-        ok: false,
-        error: errorMsg,
-      };
-    } finally {
-      isGooglePendingRef.current = false;
-    }
-  };
-
   /**
    * خروج از حساب کاربری
    */
@@ -233,11 +193,23 @@ export function useStoreAuth(showToast: (msg: string) => void) {
    * ذخیره یا به‌روزرسانی اطلاعات کاربر توسط ادمین
    */
   const adminSaveUser = async (userAccount: UserAccount) => {
+    const isMaster =
+      userAccount.id === MASTER_ADMIN.id ||
+      normalizePhone(userAccount.phone) === normalizePhone(MASTER_ADMIN_PHONE);
+
+    const docId = isMaster
+      ? MASTER_ADMIN.id
+      : userAccount.id && userAccount.id !== 'user-new'
+      ? userAccount.id
+      : `usr-${Date.now()}`;
+
     const cleanUser: UserAccount = {
       ...userAccount,
+      id: docId,
       phone: normalizePhone(userAccount.phone),
       password: normalizePhone(userAccount.password),
       fullName: userAccount.fullName.trim(),
+      role: isMaster ? 'admin' : userAccount.role,
       email: userAccount.email || '',
       createdBy: userAccount.createdBy || 'admin',
     };
@@ -246,11 +218,28 @@ export function useStoreAuth(showToast: (msg: string) => void) {
   };
 
   /**
-   * حذف کاربر توسط ادمین
+   * حذف کاربر توسط ادمین (با حفاظت کامل از مدیر کل اصلی)
    */
   const adminDeleteUser = async (userId: string) => {
-    await deleteDoc(doc(db, 'users_directory', userId));
-    showToast('کاربر مورد نظر حذف شد.');
+    const target = users.find((u) => u.id === userId);
+    if (
+      userId === MASTER_ADMIN.id ||
+      (target && normalizePhone(target.phone) === normalizePhone(MASTER_ADMIN_PHONE))
+    ) {
+      showToast('مدیر کل اصلی (کاوه آهنگر) غیرقابل حذف است.');
+      return;
+    }
+
+    // حذف بلادرنگ از استیت محلی جهت جلوگیری از تأخیر UI
+    setUsers((prev) => prev.filter((u) => u.id !== userId));
+
+    try {
+      await deleteDoc(doc(db, 'users_directory', userId));
+      showToast('کاربر مورد نظر با موفقیت حذف شد.');
+    } catch (e) {
+      console.error('Error deleting user:', e);
+      showToast('خطا در حذف کاربر از پایگاه داده.');
+    }
   };
 
   return {
@@ -258,7 +247,6 @@ export function useStoreAuth(showToast: (msg: string) => void) {
     currentUser,
     loginWithCredentials,
     registerCustomer,
-    loginWithGoogle,
     logout,
     adminSaveUser,
     adminDeleteUser,

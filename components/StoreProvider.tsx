@@ -5,6 +5,7 @@ import { Category, Product, UserAccount } from '@/lib/store-data';
 import { CartItem, useStoreCart } from '@/hooks/useStoreCart';
 import { useStoreAuth } from '@/hooks/useStoreAuth';
 import { useStoreProducts } from '@/hooks/useStoreProducts';
+import { ToastBanner } from './ToastBanner';
 
 export type { CartItem };
 
@@ -20,7 +21,6 @@ export interface StoreContextType {
   // Auth
   loginWithCredentials: (phone: string, password: string) => Promise<{ ok: boolean; error?: string }>;
   registerCustomer: (fullName: string, phone: string, password: string) => Promise<{ ok: boolean; error?: string }>;
-  loginWithGoogle: () => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
   adminSaveUser: (user: UserAccount) => Promise<void>;
   adminDeleteUser: (userId: string) => Promise<void>;
@@ -33,7 +33,9 @@ export interface StoreContextType {
     productId: string,
     price: number,
     discountedPrice: number,
-    isDiscounted: boolean
+    isDiscounted: boolean,
+    wholesalePrice?: number,
+    wholesaleMinQty?: number
   ) => Promise<void>;
   updateProductCarousel: (
     productId: string,
@@ -84,6 +86,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         showToast,
       }}
     >
+      <ToastBanner
+        message={toastMessage}
+        onClose={() => setToastMessage(null)}
+      />
       {children}
     </StoreContext.Provider>
   );

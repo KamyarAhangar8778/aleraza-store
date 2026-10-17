@@ -21,20 +21,34 @@ export function StoreFooter({ onOpenAuth }: StoreFooterProps) {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C85A32] text-white font-black text-lg">
               آ
             </div>
-            <span className="text-xl font-black">فروشگاه لوازم خانگی آلِرضا</span>
+            <span className="text-xl font-black">فروشگاه قطعات لوازم خانگی آل رضا</span>
           </div>
           <p className="text-xs text-[#B8AFA6] leading-relaxed max-w-md">
-            مرجع تخصصی لوازم جانبی آلِرضا، عرضه‌کننده مستقیم فیلترهای تصفیه آب و هوای سایدبای‌ساید، فیلتر هپا و قطعات جاروبرقی، تجهیزات باریستا و اسپرسوساز، پایه‌های ضد لرزش و ملزومات مصرفی لوازم خانگی با ضمانت اصالت فیزیکی.
+            مرجع تخصصی قطعات لوازم خانگی آل رضا — مدیریت یعقوبی. عرضه‌کننده مستقیم فیلترهای تصفیه آب و هوای سایدبای‌ساید، قطعات یدکی جاروبرقی، تجهیزات باریستا و اسپرسوساز، پایه‌های ضد لرزش و ملزومات مصرفی لوازم خانگی. پخش در مشهد و سراسر شهرستان‌ها و استان‌های کشور.
           </p>
-          <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-[#DCD4C6]">
-            <span className="inline-flex items-center gap-1.5">
-              <PhoneCall className="w-4 h-4 text-[#C85A32]" />
-              ۰۲۱-۸۸۹۹۴۴۰۰
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-[#C85A32]" />
-              تهران، بلوار آفریقا، گالری مرکزی آلِرضا
-            </span>
+          <div className="flex flex-col gap-2 pt-2 text-xs text-[#DCD4C6]">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="inline-flex items-center gap-1.5 font-bold text-white">
+                <PhoneCall className="w-4 h-4 text-[#C85A32]" />
+                تماس و سفارش:
+              </span>
+              <a href="tel:09158010113" className="hover:text-[#C85A32] transition font-mono tabular-nums text-sm">
+                ۰۹۱۵۸۰۱۰۱۱۳
+              </a>
+              <span className="text-[#8C837A]">|</span>
+              <a href="tel:09940141516" className="hover:text-[#C85A32] transition font-mono tabular-nums text-sm">
+                ۰۹۹۴۰۱۴۱۵۱۶
+              </a>
+              <span className="rounded bg-[#C85A32]/20 text-[#E59872] px-2 py-0.5 text-[11px] font-bold">
+                مدیریت یعقوبی
+              </span>
+            </div>
+            <div className="flex items-start gap-1.5 text-xs text-[#B8AFA6] pt-1">
+              <MapPin className="w-4 h-4 text-[#C85A32] shrink-0 mt-0.5" />
+              <span>
+                <strong className="text-[#FAF7F2]">نشانی دفتر (مراجعه اداری و پخش):</strong> مشهد، جلال ۶۶، پلاک ۱۶۶، زنگ اول (فروشگاه حضوری نداریم، پخش و ارسال سفارشات)
+              </span>
+            </div>
           </div>
         </div>
 
@@ -58,18 +72,18 @@ export function StoreFooter({ onOpenAuth }: StoreFooterProps) {
               </a>
             </li>
             <li>
-              <Link href="/admin" className="text-[#72aee6] hover:underline font-bold">
-                • ورود به پیشخوان مدیریت سایت (WordPress Admin)
-              </Link>
+              <a href="#why-aleraza" className="hover:text-white transition">
+                • شرایط ضمانت و خرید همکاری
+              </a>
             </li>
           </ul>
         </div>
 
-        {/* دسترسی‌های کاربری و ادمین */}
+        {/* دسترسی‌های کاربری مشتریان */}
         <div className="md:col-span-3 space-y-3">
-          <h4 className="text-sm font-extrabold text-[#E59872]">حساب کاربری و مدیریت</h4>
+          <h4 className="text-sm font-extrabold text-[#E59872]">حساب مشتریان و همکاران</h4>
           <p className="text-xs text-[#B8AFA6] leading-relaxed">
-            ورود سریع مشتریان با شماره موبایل و رمز عبور یا دسترسی به پیشخوان مجزای مدیریت.
+            مشتریان و همکاران گرامی می‌توانند با شماره موبایل و رمز عبوری که از سوی مدیریت فروشگاه برایشان ثبت شده وارد شوند.
           </p>
           <div className="flex flex-col gap-2">
             <button
@@ -77,14 +91,8 @@ export function StoreFooter({ onOpenAuth }: StoreFooterProps) {
               onClick={onOpenAuth}
               className="w-full rounded-xl bg-[#C85A32] py-2.5 text-xs font-bold text-white hover:bg-[#B04B25] transition cursor-pointer"
             >
-              ورود / ثبت‌نام مشتریان
+              ورود به حساب مشتریان آلِرضا
             </button>
-            <Link
-              href="/admin"
-              className="w-full text-center rounded-xl bg-white/10 border border-white/15 py-2.5 text-xs font-bold text-white hover:bg-white/20 transition"
-            >
-              ورود به پنل مدیریت مجزا (/admin)
-            </Link>
           </div>
         </div>
       </div>

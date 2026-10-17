@@ -19,7 +19,9 @@ interface QuickPricingSectionProps {
     productId: string,
     price: number,
     discountedPrice: number,
-    isDiscounted: boolean
+    isDiscounted: boolean,
+    wholesalePrice?: number,
+    wholesaleMinQty?: number
   ) => Promise<void>;
   onUpdateProductCarousel: (
     productId: string,
@@ -29,7 +31,7 @@ interface QuickPricingSectionProps {
 }
 
 /**
- * جدول تغییر سریع قیمت‌ها، اعمال درصد تخفیف و انتخاب محصولات اول صفحه
+ * جدول تغییر سریع قیمت‌ها، اعمال درصد تخفیف، قیمت همکاری/عمده و محصولات اول صفحه
  */
 export function QuickPricingSection({
   products,
@@ -39,7 +41,14 @@ export function QuickPricingSection({
   const [priceDrafts, setPriceDrafts] = useState<
     Record<
       string,
-      { price: number; discountedPrice: number; isDiscounted: boolean; maxCarouselImages: number }
+      {
+        price: number;
+        discountedPrice: number;
+        isDiscounted: boolean;
+        wholesalePrice?: number;
+        wholesaleMinQty?: number;
+        maxCarouselImages: number;
+      }
     >
   >({});
 
@@ -50,9 +59,18 @@ export function QuickPricingSection({
       if (
         d.price !== prod.price ||
         d.discountedPrice !== prod.discountedPrice ||
-        d.isDiscounted !== prod.isDiscounted
+        d.isDiscounted !== prod.isDiscounted ||
+        d.wholesalePrice !== prod.wholesalePrice ||
+        d.wholesaleMinQty !== prod.wholesaleMinQty
       ) {
-        await onQuickUpdatePrice(prod.id, d.price, d.discountedPrice, d.isDiscounted);
+        await onQuickUpdatePrice(
+          prod.id,
+          d.price,
+          d.discountedPrice,
+          d.isDiscounted,
+          d.wholesalePrice,
+          d.wholesaleMinQty
+        );
       }
       if (d.maxCarouselImages !== prod.maxCarouselImages) {
         await onUpdateProductCarousel(prod.id, prod.images, d.maxCarouselImages);
@@ -88,8 +106,10 @@ export function QuickPricingSection({
               <th className="py-3 px-3">محصول</th>
               <th className="py-3 px-3">قیمت اصلی (تومان)</th>
               <th className="py-3 px-3">قیمت با تخفیف (تومان)</th>
+              <th className="py-3 px-3 text-[#1F6E58]">قیمت همکاری/عمده</th>
+              <th className="py-3 px-2 text-center text-[#1F6E58]">حداقل تعداد</th>
               <th className="py-3 px-3 text-center">تخفیف اول صفحه</th>
-              <th className="py-3 px-3 text-center">تعداد عکس کاروسل</th>
+              <th className="py-3 px-3 text-center">اسلاید کاروسل</th>
               <th className="py-3 px-3 text-left">ذخیره</th>
             </tr>
           </thead>
@@ -99,6 +119,8 @@ export function QuickPricingSection({
                 price: prod.price,
                 discountedPrice: prod.discountedPrice,
                 isDiscounted: prod.isDiscounted,
+                wholesalePrice: prod.wholesalePrice,
+                wholesaleMinQty: prod.wholesaleMinQty || 5,
                 maxCarouselImages: prod.maxCarouselImages || prod.images.length,
               };
               const pct = calcDiscountPercent(draft.price, draft.discountedPrice);
@@ -118,7 +140,9 @@ export function QuickPricingSection({
                           <ProductImagePlaceholder size="sm" showText={false} className="h-full w-full" />
                         </div>
                       )}
-                      <span className="font-bold text-[#1d2327]">{prod.title}</span>
+                      <span className="font-bold text-[#1d2327] max-w-[180px] truncate block" title={prod.title}>
+                        {prod.title}
+                      </span>
                     </div>
                   </td>
                   <td className="py-3 px-3">
@@ -137,7 +161,7 @@ export function QuickPricingSection({
                           },
                         })
                       }
-                      className="w-40 rounded border border-[#8c8f94] bg-white px-2.5 py-1.5 font-mono font-bold text-xs"
+                      className="w-36 rounded border border-[#8c8f94] bg-white px-2.5 py-1.5 font-mono font-bold text-xs"
                     />
                     <div className="text-[10px] text-[#50575e] mt-0.5">
                       {formatToman(draft.price)} تومان
@@ -161,35 +185,57 @@ export function QuickPricingSection({
                           },
                         });
                       }}
-                      className="w-40 rounded border border-[#d63638] bg-white px-2.5 py-1.5 font-mono font-bold text-xs text-[#d63638]"
+                      className="w-36 rounded border border-[#d63638] bg-white px-2.5 py-1.5 font-mono font-bold text-xs text-[#d63638]"
                     />
                     <div className="flex items-center gap-1 mt-1">
                       <span className="text-[10px] text-[#d63638] font-bold">
                         ({toPersianDigits(pct)}٪-)
                       </span>
-                      {[10, 15, 20].map((quickPct) => (
-                        <button
-                          key={quickPct}
-                          type="button"
-                          onClick={() => {
-                            const base = draft.price || prod.price;
-                            const nextDisc = Math.round((base * (100 - quickPct)) / 100);
-                            setPriceDrafts({
-                              ...priceDrafts,
-                              [prod.id]: {
-                                ...draft,
-                                price: base,
-                                discountedPrice: nextDisc,
-                                isDiscounted: true,
-                              },
-                            });
-                          }}
-                          className="rounded bg-[#fcf0f1] border border-[#f5c2c7] px-1.5 py-0.5 text-[9px] font-bold text-[#d63638] hover:bg-[#d63638] hover:text-white transition cursor-pointer"
-                        >
-                          {toPersianDigits(quickPct)}٪
-                        </button>
-                      ))}
                     </div>
+                  </td>
+                  {/* قیمت همکاری / عمده */}
+                  <td className="py-3 px-3 bg-[#1F6E58]/5">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      dir="ltr"
+                      placeholder="همکاری..."
+                      value={formatNumericInput(draft.wholesalePrice)}
+                      onChange={(e) => {
+                        const val = parsePriceInput(e.target.value);
+                        setPriceDrafts({
+                          ...priceDrafts,
+                          [prod.id]: {
+                            ...draft,
+                            wholesalePrice: val > 0 ? val : undefined,
+                          },
+                        });
+                      }}
+                      className="w-32 rounded border border-[#1F6E58]/50 bg-white px-2 py-1.5 font-mono font-bold text-xs text-[#1F6E58]"
+                    />
+                    <div className="text-[10px] text-[#1F6E58] font-bold mt-0.5">
+                      {draft.wholesalePrice ? `${formatToman(draft.wholesalePrice)} تومان` : 'تعیین نشده'}
+                    </div>
+                  </td>
+                  {/* حداقل تعداد عمده */}
+                  <td className="py-3 px-2 text-center bg-[#1F6E58]/5">
+                    <input
+                      type="number"
+                      min={1}
+                      max={999}
+                      value={draft.wholesaleMinQty || 5}
+                      onChange={(e) => {
+                        const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                        setPriceDrafts({
+                          ...priceDrafts,
+                          [prod.id]: {
+                            ...draft,
+                            wholesaleMinQty: val,
+                          },
+                        });
+                      }}
+                      className="w-14 rounded border border-[#1F6E58]/40 bg-white px-1.5 py-1.5 text-center font-bold text-xs text-[#1F6E58]"
+                    />
                   </td>
                   <td className="py-3 px-3 text-center">
                     <input
@@ -209,7 +255,14 @@ export function QuickPricingSection({
                             discountedPrice: nextDisc,
                           },
                         });
-                        await onQuickUpdatePrice(prod.id, draft.price, nextDisc, checked);
+                        await onQuickUpdatePrice(
+                          prod.id,
+                          draft.price,
+                          nextDisc,
+                          checked,
+                          draft.wholesalePrice,
+                          draft.wholesaleMinQty
+                        );
                       }}
                       className="h-4 w-4 accent-[#d63638] cursor-pointer"
                     />
@@ -229,7 +282,7 @@ export function QuickPricingSection({
                           },
                         })
                       }
-                      className="w-16 rounded border border-[#8c8f94] px-2 py-1.5 text-center font-bold"
+                      className="w-14 rounded border border-[#8c8f94] px-1.5 py-1.5 text-center font-bold"
                     />
                   </td>
                   <td className="py-3 px-3 text-left">
@@ -240,7 +293,9 @@ export function QuickPricingSection({
                           prod.id,
                           draft.price,
                           draft.discountedPrice,
-                          draft.isDiscounted
+                          draft.isDiscounted,
+                          draft.wholesalePrice,
+                          draft.wholesaleMinQty
                         );
                         if (draft.maxCarouselImages !== prod.maxCarouselImages) {
                           await onUpdateProductCarousel(

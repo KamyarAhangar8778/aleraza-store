@@ -77,10 +77,15 @@ export function StoreHeader({
               تخفیف‌های ویژه لوازم جانبی و فیلترهای اورجینال با ضمانت اصالت
             </span>
           </div>
-          <div className="hidden sm:flex items-center gap-4 text-[11px] text-[#B8AFA6] shrink-0">
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-[#B8AFA6] shrink-0">
             <span className="inline-flex items-center gap-1">
               <PhoneCall className="w-3.5 h-3.5 text-[#C85A32]" />
-              ۰۲۱-۸۸۹۹۴۴۰۰
+              <a href="tel:09158010113" className="hover:text-white transition font-mono tabular-nums">۰۹۱۵۸۰۱۰۱۱۳</a>
+              <span className="text-[#8C837A]">/</span>
+              <a href="tel:09940141516" className="hover:text-white transition font-mono tabular-nums">۰۹۹۴۰۱۴۱۵۱۶</a>
+            </span>
+            <span className="text-[10px] text-[#E59872] bg-[#C85A32]/15 px-1.5 py-0.5 rounded">
+              مدیریت یعقوبی
             </span>
           </div>
         </div>
@@ -96,11 +101,11 @@ export function StoreHeader({
             </div>
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h1 className="text-lg sm:text-2xl font-black tracking-tight text-[#181615]">
-                  آلِرضا
+                <h1 className="text-base sm:text-xl font-black tracking-tight text-[#181615]">
+                  قطعات لوازم خانگی آل رضا
                 </h1>
                 <span className="hidden sm:inline-block rounded-md bg-[#C85A32]/15 px-2 py-0.5 text-[10px] font-extrabold text-[#C85A32]">
-                  ALERAZA ACCESSORIES
+                  ALERAZA PARTS
                 </span>
               </div>
               <p className="text-[11px] text-[#6E675F] hidden md:block">
@@ -138,17 +143,8 @@ export function StoreHeader({
             </a>
           </nav>
 
-          {/* دکمه‌های کنترلی سمت راست (پیشخوان، ورود کاربر، سبد خرید) */}
+          {/* دکمه‌های کنترلی سمت راست (ورود مشتری، سبد خرید) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <Link
-              href="/admin"
-              title="پیشخوان مدیریت"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#1d2327] p-2 sm:px-3.5 sm:py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#2271b1] transition"
-            >
-              <LayoutDashboard className="w-4 h-4 text-[#72aee6]" />
-              <span className="hidden sm:inline">پیشخوان مدیریت</span>
-            </Link>
-
             {currentUser ? (
               <div className="flex items-center gap-1.5 rounded-xl bg-white border border-[#DCD4C6] p-1.5 sm:px-3 sm:py-2">
                 <div className="text-right hidden sm:block">
@@ -156,14 +152,14 @@ export function StoreHeader({
                     {currentUser.fullName}
                   </p>
                   <p className="text-[10px] text-[#1F6E58] font-bold mt-0.5">
-                    {currentUser.role === 'admin' ? 'مدیر سیستم' : 'مشتری آلِرضا'}
+                    {currentUser.role === 'admin' ? 'مدیر سیستم' : 'مشتری آلِرضا (همکار)'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={onLogout}
                   title="خروج از حساب"
-                  className="rounded-lg p-1.5 text-[#8C837A] hover:bg-[#D92D20]/10 hover:text-[#D92D20] transition min-h-[36px] min-w-[36px] flex items-center justify-center"
+                  className="rounded-lg p-1.5 text-[#8C837A] hover:bg-[#D92D20]/10 hover:text-[#D92D20] transition min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -172,11 +168,11 @@ export function StoreHeader({
               <button
                 type="button"
                 onClick={onOpenAuth}
-                title="ورود یا ثبت‌نام"
+                title="ورود به حساب مشتری"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-white border border-[#DCD4C6] p-2 sm:px-3.5 sm:py-2.5 text-xs font-bold text-[#181615] hover:border-[#C85A32] transition cursor-pointer min-h-[36px] min-w-[36px] justify-center"
               >
                 <User className="w-4 h-4 text-[#C85A32]" />
-                <span className="hidden sm:inline">ورود / ثبت‌نام</span>
+                <span className="hidden sm:inline">ورود مشتریان</span>
               </button>
             )}
 

@@ -90,27 +90,17 @@ export function MobileBottomNav({
           <span className="text-[10px] font-bold mt-1">سبد خرید</span>
         </button>
 
-        {/* ۵. ورود / حساب کاربری یا پیشخوان ادمین */}
-        {currentUser?.role === 'admin' ? (
-          <a
-            href="/admin"
-            className="flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] text-[#2271b1] active:scale-95 transition"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">پیشخوان</span>
-          </a>
-        ) : (
-          <button
-            type="button"
-            onClick={onOpenAuth}
-            className="flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] text-[#4A453F] hover:text-[#C85A32] active:scale-95 transition"
-          >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">
-              {currentUser ? 'پروفایل' : 'ورود'}
-            </span>
-          </button>
-        )}
+        {/* ۵. ورود / حساب کاربری */}
+        <button
+          type="button"
+          onClick={onOpenAuth}
+          className="flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] text-[#4A453F] hover:text-[#C85A32] active:scale-95 transition"
+        >
+          <User className="w-5 h-5" />
+          <span className="text-[10px] font-bold mt-1">
+            {currentUser ? 'حساب من' : 'ورود'}
+          </span>
+        </button>
       </div>
     </nav>
   );

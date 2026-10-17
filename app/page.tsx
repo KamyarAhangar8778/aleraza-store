@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { CheckCircle2 } from 'lucide-react';
 import { useStore } from '@/components/StoreProvider';
 import { Product, calcDiscountPercent } from '@/lib/store-data';
 import { AuthModal } from '@/components/AuthModal';
@@ -27,7 +26,6 @@ export default function AlerazaLandingPage() {
     currentUser,
     cart,
     logout,
-    toastMessage,
     isLoading,
   } = useStore();
 
@@ -86,13 +84,7 @@ export default function AlerazaLandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#181615]">
-      {/* پیام تست یا توست شناور در پایین صفحه */}
-      {toastMessage && (
-        <div className="fixed bottom-20 sm:bottom-6 left-4 sm:left-6 z-50 flex items-center gap-2.5 rounded-2xl bg-[#181615] px-4 sm:px-5 py-3 sm:py-3.5 text-xs font-bold text-[#FAF7F2] shadow-2xl border border-[#C85A32]/40">
-          <CheckCircle2 className="w-4 h-4 text-[#C85A32]" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+
 
       {/* هدر یکپارچه فروشگاه */}
       <StoreHeader

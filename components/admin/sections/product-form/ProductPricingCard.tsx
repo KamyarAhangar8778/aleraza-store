@@ -170,6 +170,98 @@ export function ProductPricingCard({ product, onChange }: ProductPricingCardProp
             ))}
           </div>
         </div>
+
+        {/* بخش قیمت همکاری و عمده (مخصوص مشتریان عضو که توسط ادمین ثبت شده‌اند) */}
+        <div className="p-4 rounded border-2 border-[#1F6E58]/30 bg-[#1F6E58]/5 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#1F6E58]" />
+              <h4 className="text-xs font-black text-[#1F6E58]">
+                قیمت همکاری یا قیمت عمده (ویژه مشتریان عضو با حداقل تعداد)
+              </h4>
+            </div>
+            <span className="text-[10px] text-[#1F6E58] bg-[#1F6E58]/10 px-2 py-0.5 rounded font-bold">
+              قیمت اختصاصی مشتریان
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* قیمت همکاری / عمده */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#1d2327]">
+                  قیمت هر عدد برای خرید عمده/همکاری (تومان)
+                </label>
+                {product.wholesalePrice ? (
+                  <button
+                    type="button"
+                    onClick={() => onChange({ ...product, wholesalePrice: undefined })}
+                    className="text-[11px] text-[#d63638] hover:underline cursor-pointer"
+                  >
+                    غیرفعال‌سازی
+                  </button>
+                ) : null}
+              </div>
+              <input
+                type="text"
+                inputMode="numeric"
+                dir="ltr"
+                placeholder="مثلاً: 18,000,000"
+                value={formatNumericInput(product.wholesalePrice)}
+                onChange={(e) => {
+                  const val = parsePriceInput(e.target.value);
+                  onChange({ ...product, wholesalePrice: val > 0 ? val : undefined });
+                }}
+                className="w-full rounded border border-[#1F6E58]/50 bg-white px-3 py-2 font-mono font-bold text-sm text-[#1F6E58] focus:border-[#1F6E58] focus:outline-none"
+              />
+              <div className="text-[11px] text-[#1F6E58] font-bold">
+                {product.wholesalePrice && product.wholesalePrice > 0 ? (
+                  <>معادل: {formatToman(product.wholesalePrice)} تومان</>
+                ) : (
+                  <span className="text-[#8c8f94] font-normal">قیمت همکاری هنوز تعریف نشده است</span>
+                )}
+              </div>
+            </div>
+
+            {/* حداقل تعداد برای قیمت همکاری */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#1d2327] block">
+                حداقل تعداد خرید برای اعمال قیمت همکاری/عمده
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={999}
+                  placeholder="5"
+                  value={product.wholesaleMinQty || 5}
+                  onChange={(e) => {
+                    const q = Math.max(1, parseInt(e.target.value, 10) || 1);
+                    onChange({ ...product, wholesaleMinQty: q });
+                  }}
+                  className="w-24 rounded border border-[#8c8f94] bg-white px-3 py-2 text-center font-bold text-sm text-[#1d2327] focus:border-[#1F6E58] focus:outline-none"
+                />
+                <span className="text-xs text-[#50575e] font-bold">عدد به بالا</span>
+              </div>
+              <div className="flex items-center gap-1.5 pt-1">
+                {[3, 5, 10, 15, 20].map((qty) => (
+                  <button
+                    key={qty}
+                    type="button"
+                    onClick={() => onChange({ ...product, wholesaleMinQty: qty })}
+                    className={`rounded px-2 py-0.5 text-[10px] font-bold transition cursor-pointer border ${
+                      (product.wholesaleMinQty || 5) === qty
+                        ? 'bg-[#1F6E58] text-white border-[#1F6E58]'
+                        : 'bg-white text-[#1F6E58] border-[#1F6E58]/30 hover:bg-[#1F6E58]/10'
+                    }`}
+                  >
+                    بالای {toPersianDigits(qty)} تا
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

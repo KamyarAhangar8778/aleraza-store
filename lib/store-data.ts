@@ -17,12 +17,15 @@ export interface Product {
   price: number; // Original price in Toman
   discountedPrice: number; // Final selling price in Toman
   isDiscounted: boolean; // Appears in top discounted showcase
+  wholesalePrice?: number; // Wholesale / partner price in Toman (قیمت همکاری یا عمده)
+  wholesaleMinQty?: number; // Minimum quantity to trigger wholesale price (حداقل تعداد برای قیمت همکاری)
   images: string[]; // Array of carousel image URLs
   maxCarouselImages: number; // Number of carousel images enabled to display
   features: string[];
   badge: string;
   stock: number;
   warranty: string;
+  warrantyIcon?: string; // Icon name for warranty badge (e.g. ShieldCheck, BadgeCheck, Award, Sparkles, Check, Clock, Shield)
   createdAt: string;
 }
 
@@ -150,6 +153,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 1850000,
     discountedPrice: 1390000,
     isDiscounted: true,
+    wholesalePrice: 1150000,
+    wholesaleMinQty: 5,
     images: [
       '/images/fridge_water_filter.jpg',
       '/images/hero_appliance_accessories.jpg',
@@ -174,6 +179,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 3450000,
     discountedPrice: 2690000,
     isDiscounted: true,
+    wholesalePrice: 2200000,
+    wholesaleMinQty: 3,
     images: [
       '/images/espresso_barista_kit.jpg',
       '/images/espresso_maker_pro.jpg',
@@ -199,6 +206,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 2100000,
     discountedPrice: 1580000,
     isDiscounted: true,
+    wholesalePrice: 1300000,
+    wholesaleMinQty: 5,
     images: [
       '/images/vacuum_hepa_kit.jpg',
       '/images/cordless_vacuum_pro.jpg',
@@ -224,6 +233,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 1250000,
     discountedPrice: 890000,
     isDiscounted: true,
+    wholesalePrice: 720000,
+    wholesaleMinQty: 6,
     images: [
       '/images/airfryer_accessory_pack.jpg',
       '/images/smart_air_fryer.jpg',
@@ -249,6 +260,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 980000,
     discountedPrice: 740000,
     isDiscounted: true,
+    wholesalePrice: 580000,
+    wholesaleMinQty: 10,
     images: [
       '/images/washer_care_stand.jpg',
       '/images/smart_washer_titanium.jpg',
@@ -274,6 +287,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     price: 2400000,
     discountedPrice: 2400000,
     isDiscounted: false,
+    wholesalePrice: 1950000,
+    wholesaleMinQty: 3,
     images: [
       '/images/stand_mixer_copper.jpg',
       '/images/hero_appliance_accessories.jpg',
@@ -292,28 +307,20 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
 ];
 
-export const INITIAL_USERS: UserAccount[] = [
-  {
-    id: 'user-admin-default',
-    fullName: 'مدیر کل آلِرضا',
-    phone: '09120000000',
-    password: '123456',
-    role: 'admin',
-    email: 'kavehahangar8778@gmail.com',
-    createdAt: '2026-09-28T09:00:00.000Z',
-    createdBy: 'system',
-  },
-  {
-    id: 'user-customer-sample',
-    fullName: 'سارا محمدی',
-    phone: '09121112233',
-    password: '123456',
-    role: 'customer',
-    email: '',
-    createdAt: '2026-09-28T09:30:00.000Z',
-    createdBy: 'admin',
-  },
-];
+export const MASTER_ADMIN_PHONE = '09044508763';
+
+export const MASTER_ADMIN: UserAccount = {
+  id: 'master-admin-kaveh',
+  fullName: 'کاوه آهنگر',
+  phone: '09044508763',
+  password: 'Kavehahangar@8778@',
+  role: 'admin',
+  email: 'kavehahangar8778@gmail.com',
+  createdAt: '2026-09-28T09:00:00.000Z',
+  createdBy: 'system',
+};
+
+export const INITIAL_USERS: UserAccount[] = [MASTER_ADMIN];
 
 export function formatToman(amount: number): string {
   return new Intl.NumberFormat('fa-IR').format(Math.max(0, Math.round(amount)));

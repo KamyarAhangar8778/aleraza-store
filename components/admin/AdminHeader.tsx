@@ -20,7 +20,7 @@ export function AdminHeader({ currentUser }: AdminHeaderProps) {
           <div className="h-7 w-7 rounded bg-[#2271b1] text-white flex items-center justify-center font-black text-sm">
             آ
           </div>
-          <span className="hidden sm:inline">پیشخوان مدیریت وردپرس آلِرضا</span>
+          <span className="hidden sm:inline">پیشخوان مدیریت قطعات لوازم خانگی آل رضا</span>
         </div>
 
         <Link

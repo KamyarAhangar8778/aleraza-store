@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { UserAccount } from '@/lib/store-data';
+import {
+  UserAccount,
+  MASTER_ADMIN,
+  MASTER_ADMIN_PHONE,
+  normalizePhone,
+} from '@/lib/store-data';
 
 interface UsersSectionProps {
   users: UserAccount[];
@@ -77,8 +82,8 @@ export function UsersSection({
               ? 'ویرایش کاربر'
               : 'افزودن کاربر تازه (با نام، شماره موبایل و رمز عبور)'}
           </h1>
-          <p className="text-xs text-[#50575e] mt-1">
-            کاربر جدیدی بسازید و آن را به سایت آلِرضا اضافه کنید. کاربر می‌تواند با همین شماره و رمز وارد سایت شود.
+          <p className="text-xs text-[#50575e] mt-1 leading-relaxed">
+            مشتریان و همکارانی که در اینجا ثبت می‌کنید، می‌توانند با شماره موبایل و رمز عبور وارد سایت شوند و قیمت‌های همکاری و عمده اختصاصی برای آن‌ها فعال می‌گردد (ثبت‌نام عمومی در سایت بسته است).
           </p>
         </div>
 
@@ -218,7 +223,12 @@ export function UsersSection({
                   >
                     ویرایش
                   </button>
-                  {confirmDeleteUserId === u.id ? (
+                  {u.id === MASTER_ADMIN.id ||
+                  normalizePhone(u.phone) === normalizePhone(MASTER_ADMIN_PHONE) ? (
+                    <span className="text-[10px] text-[#50575e] bg-[#f0f0f1] px-2 py-0.5 rounded font-bold border border-[#dcdcde]">
+                      مدیر کل (غیرقابل حذف)
+                    </span>
+                  ) : confirmDeleteUserId === u.id ? (
                     <span className="inline-flex items-center gap-1 bg-[#fcf0f1] px-1.5 py-0.5 rounded border border-[#f5c2c7]">
                       <span className="text-[10px] font-bold text-[#d63638]">حذف شود؟</span>
                       <button

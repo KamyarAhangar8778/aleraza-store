@@ -131,15 +131,24 @@ export function useStoreProducts(showToast: (msg: string) => void) {
       price: rawPrice,
       discountedPrice: rawDiscounted,
       isDiscounted: Boolean(product.isDiscounted),
+      wholesalePrice:
+        product.wholesalePrice !== undefined && Number(product.wholesalePrice) > 0
+          ? Math.round(Number(product.wholesalePrice))
+          : undefined,
+      wholesaleMinQty:
+        product.wholesaleMinQty !== undefined && Number(product.wholesaleMinQty) > 0
+          ? Math.max(1, Math.round(Number(product.wholesaleMinQty)))
+          : undefined,
       maxCarouselImages: Math.min(
         20,
         Math.max(1, Number(product.maxCarouselImages) || (safeImages.length > 0 ? safeImages.length : 1))
       ),
       images: safeImages.slice(0, 20),
       features: Array.isArray(product.features) ? product.features : [],
-      badge: product.badge || '',
+      badge: (product.badge || '').trim(),
       stock: Number.isFinite(Number(product.stock)) ? Number(product.stock) : 10,
-      warranty: product.warranty || '۲۴ ماه ضمانت آلِرضا سرویس',
+      warranty: product.warranty !== undefined ? product.warranty.trim() : 'ضمانت اصالت و سلامت قطعه',
+      warrantyIcon: product.warrantyIcon || 'ShieldCheck',
       createdAt: product.createdAt || new Date().toISOString(),
     };
 
@@ -225,7 +234,9 @@ export function useStoreProducts(showToast: (msg: string) => void) {
     productId: string,
     price: number,
     discountedPrice: number,
-    isDiscounted: boolean
+    isDiscounted: boolean,
+    wholesalePrice?: number,
+    wholesaleMinQty?: number
   ) => {
     const existing = products.find((p) => p.id === productId);
     if (!existing) return;
@@ -246,6 +257,18 @@ export function useStoreProducts(showToast: (msg: string) => void) {
       price: cleanPrice,
       discountedPrice: cleanDiscounted,
       isDiscounted: Boolean(isDiscounted),
+      wholesalePrice:
+        wholesalePrice !== undefined
+          ? wholesalePrice > 0
+            ? Math.round(wholesalePrice)
+            : undefined
+          : existing.wholesalePrice,
+      wholesaleMinQty:
+        wholesaleMinQty !== undefined
+          ? wholesaleMinQty > 0
+            ? Math.round(wholesaleMinQty)
+            : undefined
+          : existing.wholesaleMinQty,
     };
 
     setProducts((prev) => prev.map((p) => (p.id === productId ? updated : p)));

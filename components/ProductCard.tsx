@@ -23,6 +23,7 @@ import {
 import { useStore } from './StoreProvider';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 import { Toman } from './TomanIcon';
+import { WarrantyIcon } from './WarrantyIcon';
 
 interface ProductCardProps {
   product: Product;
@@ -118,7 +119,7 @@ export function ProductCard({
               </span>
             )}
             {product.badge && (
-              <span className="hidden sm:inline-flex items-center rounded-lg bg-[#181615]/85 backdrop-blur-md px-2 py-0.5 text-[10px] sm:text-xs font-medium text-[#FAF7F2]">
+              <span className="inline-flex items-center rounded-md sm:rounded-lg bg-[#181615]/85 backdrop-blur-md px-2 py-0.5 text-[10px] sm:text-xs font-bold text-[#FAF7F2] shadow-xs">
                 {product.badge}
               </span>
             )}
@@ -187,18 +188,21 @@ export function ProductCard({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-1.5">
-            {currentUser?.role === 'admin' && onAdminEditProduct && (
-              <button
-                type="button"
+            {currentUser?.role === 'admin' && (
+              <a
+                href="/admin"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  onAdminEditProduct(product);
+                  if (onAdminEditProduct) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onAdminEditProduct(product);
+                  }
                 }}
-                className="hidden sm:inline-flex items-center gap-1 rounded-md bg-[#C85A32] px-2 py-1 text-[11px] font-medium text-white shadow hover:bg-[#B04B25] transition"
+                className="hidden sm:inline-flex items-center gap-1 rounded-md bg-[#C85A32] px-2 py-1 text-[11px] font-bold text-white shadow hover:bg-[#B04B25] transition"
               >
                 <SlidersHorizontal className="w-3 h-3" />
                 ویرایش
-              </button>
+              </a>
             )}
             <button
               type="button"
@@ -250,10 +254,12 @@ export function ProductCard({
             <span className="font-bold text-[#C85A32] truncate">
               {category ? category.name : 'آلِرضا'}
             </span>
-            <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[11px] text-[#1F6E58] bg-[#1F6E58]/10 px-1.5 py-0.5 rounded shrink-0">
-              <ShieldCheck className="w-3 h-3" />
-              <span className="truncate max-w-[70px] sm:max-w-none">{product.warranty.split('+')[0]}</span>
-            </span>
+            {product.warranty && (
+              <span className="inline-flex items-center gap-1 text-[9px] sm:text-[11px] text-[#1F6E58] bg-[#1F6E58]/10 px-1.5 py-0.5 rounded shrink-0">
+                <WarrantyIcon iconName={product.warrantyIcon} className="w-3 h-3 text-[#1F6E58]" />
+                <span className="truncate max-w-[80px] sm:max-w-none">{product.warranty.split('+')[0]}</span>
+              </span>
+            )}
           </div>
 
           {/* Product Title */}
@@ -271,45 +277,74 @@ export function ProductCard({
         </div>
 
         {/* Pricing & Action Footer */}
-        <div className="mt-3 sm:mt-5 pt-2.5 sm:pt-4 border-t border-[#EFECE6] flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-3">
-          <div>
+        <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-[#EFECE6] space-y-2">
+          {/* قیمت معمولی */}
+          <div className="flex items-baseline justify-between gap-1.5">
+            <span className="text-[10px] sm:text-xs font-bold text-[#6E675F]">قیمت معمولی:</span>
             {product.isDiscounted && product.discountedPrice < product.price ? (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] sm:text-xs text-[#8C837A] line-through">
-                    {formatToman(product.price)}
-                  </span>
-                  <span className="text-[9px] sm:text-[11px] font-bold text-[#D92D20] bg-[#D92D20]/10 px-1 py-0.2 rounded">
-                    {toPersianDigits(discountPercent)}٪-
-                  </span>
-                </div>
-                <div className="mt-0.5 flex items-center gap-1">
-                  <span className="text-sm sm:text-xl font-extrabold text-[#181615] tracking-tight">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-[#8C837A] line-through">
+                  {formatToman(product.price)}
+                </span>
+                <span className="text-[9px] font-bold text-[#D92D20] bg-[#D92D20]/10 px-1 py-0.2 rounded">
+                  {toPersianDigits(discountPercent)}٪-
+                </span>
+                <div className="flex items-center gap-0.5">
+                  <span className="text-xs sm:text-base font-black text-[#181615] tracking-tight">
                     {formatToman(product.discountedPrice)}
                   </span>
-                  <Toman className="text-[10px] sm:text-[11px] text-[#8C837A] font-medium" />
+                  <Toman className="text-[9px] text-[#8C837A]" />
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col">
-                <span className="text-[9px] sm:text-[11px] text-[#6E675F]">قیمت:</span>
-                <div className="mt-0.5 flex items-center gap-1">
-                  <span className="text-sm sm:text-xl font-extrabold text-[#181615] tracking-tight">
-                    {formatToman(product.price)}
-                  </span>
-                  <Toman className="text-[10px] sm:text-[11px] text-[#8C837A] font-medium" />
-                </div>
+              <div className="flex items-center gap-0.5">
+                <span className="text-xs sm:text-base font-black text-[#181615] tracking-tight">
+                  {formatToman(product.price)}
+                </span>
+                <Toman className="text-[9px] text-[#8C837A]" />
               </div>
             )}
           </div>
 
+          {/* قیمت همکاری یا عمده برای تعداد بالای X تا */}
+          {product.wholesalePrice && product.wholesalePrice > 0 ? (
+            <div
+              className={`p-2 rounded-xl text-[10px] sm:text-[11px] transition ${
+                currentUser
+                  ? 'bg-[#1F6E58]/10 border border-[#1F6E58]/25 text-[#1F6E58]'
+                  : 'bg-[#F3EFE6] border border-[#E6DFD3] text-[#6E675F]'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-1 font-bold">
+                <span className="flex items-center gap-1 truncate">
+                  <span className="h-1.5 w-1.5 rounded-full bg-current shrink-0" />
+                  <span>قیمت همکاری / عمده:</span>
+                </span>
+                <div className="flex items-center gap-0.5 shrink-0 font-black">
+                  <span>{formatToman(product.wholesalePrice)}</span>
+                  <Toman className="text-[9px] text-current" />
+                </div>
+              </div>
+              <div className="mt-0.5 flex items-center justify-between text-[9px] sm:text-[10px] opacity-90">
+                <span>برای تعداد بالای {toPersianDigits(product.wholesaleMinQty || 5)} عدد</span>
+                {currentUser ? (
+                  <span className="font-extrabold text-[#1F6E58] bg-[#1F6E58]/15 px-1.5 py-0.2 rounded">
+                    فعال برای شما
+                  </span>
+                ) : (
+                  <span className="text-[#C85A32] font-semibold">ویژه مشتریان عضو</span>
+                )}
+              </div>
+            </div>
+          ) : null}
+
           <button
             type="button"
             onClick={() => addToCart(product)}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#181615] px-2.5 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold text-[#FAF7F2] shadow-sm transition hover:bg-[#C85A32] active:scale-95 min-h-[38px] cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#181615] px-2.5 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold text-[#FAF7F2] shadow-sm transition hover:bg-[#C85A32] active:scale-95 min-h-[38px] cursor-pointer"
           >
             <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>افزودن</span>
+            <span>افزودن به سبد خرید</span>
           </button>
         </div>
       </div>

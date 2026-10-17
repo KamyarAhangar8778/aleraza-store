@@ -12,6 +12,7 @@ import {
   BadgePercent,
   LogOut,
 } from 'lucide-react';
+import { UserAccount } from '@/lib/store-data';
 
 export type WpSection =
   | 'dashboard'
@@ -26,6 +27,7 @@ export type WpSection =
 interface AdminSidebarProps {
   activeSection: WpSection;
   isNewProductMode: boolean;
+  currentUser: UserAccount | null;
   onSelectSection: (section: WpSection) => void;
   onOpenNewProduct: () => void;
   onLogout: () => void;
@@ -37,6 +39,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({
   activeSection,
   isNewProductMode,
+  currentUser,
   onSelectSection,
   onOpenNewProduct,
   onLogout,
@@ -136,36 +139,40 @@ export function AdminSidebar({
             <span>رسانه‌ها و کاروسل تصاویر</span>
           </button>
 
-          {/* کاربران */}
-          <div className="pt-2 pb-1 px-4 text-[10px] uppercase font-bold text-[#8c8f94] tracking-wider">
-            کاربران و مشتریان
-          </div>
+          {/* کاربران و مشتریان - فقط برای مدیر کل */}
+          {currentUser?.role === 'admin' && (
+            <>
+              <div className="pt-2 pb-1 px-4 text-[10px] uppercase font-bold text-[#8c8f94] tracking-wider">
+                کاربران و مشتریان
+              </div>
 
-          <button
-            type="button"
-            onClick={() => onSelectSection('all-users')}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 text-right transition cursor-pointer ${
-              activeSection === 'all-users'
-                ? 'bg-[#2271b1] text-white font-bold'
-                : 'hover:bg-[#2c3338] hover:text-[#72aee6]'
-            }`}
-          >
-            <Users className="w-4 h-4 shrink-0" />
-            <span>فهرست کاربران</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => onSelectSection('all-users')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-right transition cursor-pointer ${
+                  activeSection === 'all-users'
+                    ? 'bg-[#2271b1] text-white font-bold'
+                    : 'hover:bg-[#2c3338] hover:text-[#72aee6]'
+                }`}
+              >
+                <Users className="w-4 h-4 shrink-0" />
+                <span>فهرست کاربران</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => onSelectSection('add-user')}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 text-right transition cursor-pointer ${
-              activeSection === 'add-user'
-                ? 'bg-[#2271b1] text-white font-bold'
-                : 'hover:bg-[#2c3338] hover:text-[#72aee6]'
-            }`}
-          >
-            <UserPlus className="w-4 h-4 shrink-0" />
-            <span>افزودن کاربر جدید</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => onSelectSection('add-user')}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-right transition cursor-pointer ${
+                  activeSection === 'add-user'
+                    ? 'bg-[#2271b1] text-white font-bold'
+                    : 'hover:bg-[#2c3338] hover:text-[#72aee6]'
+                }`}
+              >
+                <UserPlus className="w-4 h-4 shrink-0" />
+                <span>افزودن کاربر جدید</span>
+              </button>
+            </>
+          )}
         </nav>
       </div>
 

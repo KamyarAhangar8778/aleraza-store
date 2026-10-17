@@ -33,7 +33,6 @@ export default function WordPressAdminPage() {
     users,
     currentUser,
     loginWithCredentials,
-    loginWithGoogle,
     logout,
     saveProduct,
     deleteProduct,
@@ -60,12 +59,15 @@ export default function WordPressAdminPage() {
     price: 18500000,
     discountedPrice: 15900000,
     isDiscounted: true,
+    wholesalePrice: 13500000,
+    wholesaleMinQty: 5,
     images: [],
     maxCarouselImages: 3,
-    features: ['گارانتی ۳۶ ماهه طلایی آلِرضا سرویس', 'ارسال و نصب رایگان در سراسر کشور'],
-    badge: 'پیشنهاد ویژه',
-    stock: 12,
-    warranty: '۳۶ ماه ضمانت طلایی آلِرضا',
+    features: ['ضمانت اصالت و سلامت فیزیکی قطعه', 'ارسال سریع قطعات در سراسر کشور'],
+    badge: '',
+    stock: 10,
+    warranty: 'ضمانت اصالت و سلامت قطعه',
+    warrantyIcon: 'ShieldCheck',
     createdAt: new Date().toISOString(),
   });
 
@@ -148,7 +150,6 @@ export default function WordPressAdminPage() {
     return (
       <AdminLoginScreen
         onLogin={loginWithCredentials}
-        onLoginWithGoogle={loginWithGoogle}
       />
     );
   }
@@ -163,6 +164,7 @@ export default function WordPressAdminPage() {
         <AdminSidebar
           activeSection={activeSection}
           isNewProductMode={isNewProductMode}
+          currentUser={currentUser}
           onSelectSection={(sec) => setActiveSection(sec)}
           onOpenNewProduct={handleOpenNewProduct}
           onLogout={logout}
@@ -243,13 +245,28 @@ export default function WordPressAdminPage() {
           )}
 
           {(activeSection === 'all-users' || activeSection === 'add-user') && (
-            <UsersSection
-              users={users}
-              activeSubSection={activeSection}
-              onSelectSubSection={(sub) => setActiveSection(sub)}
-              onAdminSaveUser={adminSaveUser}
-              onAdminDeleteUser={adminDeleteUser}
-            />
+            currentUser?.role === 'admin' ? (
+              <UsersSection
+                users={users}
+                activeSubSection={activeSection}
+                onSelectSubSection={(sub) => setActiveSection(sub)}
+                onAdminSaveUser={adminSaveUser}
+                onAdminDeleteUser={adminDeleteUser}
+              />
+            ) : (
+              <div className="bg-white border border-[#c3c4c7] p-8 rounded-sm text-center max-w-lg mx-auto mt-10 space-y-3">
+                <div className="text-[#d63638] font-bold text-sm">
+                  دسترسی به بخش مدیریت کاربران و مشتریان محدود به مدیر کل می‌باشد.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection('dashboard')}
+                  className="rounded bg-[#2271b1] px-4 py-2 text-xs font-bold text-white hover:bg-[#135e96] transition cursor-pointer"
+                >
+                  بازگشت به پیشخوان اصلی
+                </button>
+              </div>
+            )
           )}
         </main>
       </div>

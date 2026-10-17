@@ -21,13 +21,18 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { cart, removeFromCart, updateCartQty, clearCart, showToast } = useStore();
+  const { cart, removeFromCart, updateCartQty, clearCart, showToast, currentUser } = useStore();
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   if (!isOpen) return null;
 
   const totalAmount = cart.reduce((acc, item) => {
-    const unitPrice = item.product.isDiscounted
+    const hasWholesale = Boolean(item.product.wholesalePrice && item.product.wholesalePrice > 0);
+    const minQty = item.product.wholesaleMinQty || 5;
+    const isWholesaleApplied = Boolean(currentUser) && hasWholesale && item.quantity >= minQty;
+    const unitPrice = isWholesaleApplied
+      ? item.product.wholesalePrice!
+      : item.product.isDiscounted
       ? item.product.discountedPrice
       : item.product.price;
     return acc + unitPrice * item.quantity;
@@ -88,9 +93,15 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             </div>
           ) : (
             cart.map(({ product, quantity }) => {
-              const unitPrice = product.isDiscounted
+              const hasWholesale = Boolean(product.wholesalePrice && product.wholesalePrice > 0);
+              const minQty = product.wholesaleMinQty || 5;
+              const isWholesaleApplied = Boolean(currentUser) && hasWholesale && quantity >= minQty;
+              const unitPrice = isWholesaleApplied
+                ? product.wholesalePrice!
+                : product.isDiscounted
                 ? product.discountedPrice
                 : product.price;
+
               return (
                 <div
                   key={product.id}
@@ -112,12 +123,27 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <h4 className="text-xs font-bold text-[#181615] line-clamp-1">
                       {product.title}
                     </h4>
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="text-xs font-extrabold text-[#C85A32]">
-                        {formatToman(unitPrice)}
-                      </span>
-                      <Toman className="text-[10px] text-[#8C837A]" />
+
+                    {/* قیمت هر عدد و وضعیت همکاری */}
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                      <div className="flex items-center gap-1">
+                        <span className={`text-xs font-extrabold ${isWholesaleApplied ? 'text-[#1F6E58]' : 'text-[#C85A32]'}`}>
+                          {formatToman(unitPrice)}
+                        </span>
+                        <Toman className="text-[10px] text-[#8C837A]" />
+                      </div>
+
+                      {isWholesaleApplied ? (
+                        <span className="text-[9px] font-extrabold text-[#1F6E58] bg-[#1F6E58]/15 px-1.5 py-0.5 rounded">
+                          قیمت عمده (خرید بالای {toPersianDigits(minQty)} تا)
+                        </span>
+                      ) : currentUser && hasWholesale ? (
+                        <span className="text-[9px] text-[#8C837A]">
+                          (خرید {toPersianDigits(minQty)} تا = {formatToman(product.wholesalePrice!)} ت)
+                        </span>
+                      ) : null}
                     </div>
+
                     <div className="mt-2 flex items-center justify-between">
                       <div className="inline-flex items-center gap-2 rounded-lg bg-[#F3EFE6] px-2 py-1">
                         <button
