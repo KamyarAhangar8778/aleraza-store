@@ -272,3 +272,36 @@ package.json شامل dev، build، start و lint است و وابستگی Fireb
 - افزونهٔ رسمی ترب برای WooCommerce موجود است: https://wordpress.org/plugins/products-extractor-for-woocommerce/؛ پس از نصب WooCommerce در staging آزمایش شود. فعلاً افزونهٔ اختصاصی نسازیم مگر نیاز پوشش‌داده‌نشده‌ای اثبات شود.
 - پیشنهاد فعلی: ابتدا معماری را بررسی کنیم و سپس دامنه/هاست سازگار انتخاب شود، نه اینکه بعد از خرید زیرساخت به معماری تحمیل شود.
 - این به‌روزرسانی فقط مستند است؛ کد، تنظیمات برنامه و داده‌ها تغییر نکرده‌اند. نصب وردپرس، build و اتصال ترب انجام نشده‌اند.
+
+
+## 15. ممیزی معماری: مقایسهٔ فرانت‌اند (2026-10-17)
+
+### گزینه A — Next.js به‌صورت static export + WordPress/WooCommerce به‌عنوان backend
+**مزایا:** بیشترین استفادهٔ مجدد از UI فعلی React/Next.js؛ طراحی اختصاصی و کامپوننت‌ها حفظ می‌شوند؛ فایل‌های static روی هاست PHP قابل سرو هستند؛ WooCommerce Store API برای دادهٔ عمومی محصول و cart/checkout مشتری در دسترس است.
+**ریسک‌ها و هزینه‌ها:** static export فقط routeهایی را تولید می‌کند که در build شناخته شده‌اند؛ `generateStaticParams` در زمان build مسیرها را تولید می‌کند و به‌تنهایی راهی برای انتشار خودکار HTML محصولات جدید پس از build روی هاست ایستا نیست. بنابراین محصول جدید/تغییر محتوا نیازمند فرایند rebuild و deploy، یا راهکار دیگر است. همچنین cart/checkout، session/cookies، nonce/token و payment باید با Store API و gatewayها واقعاً آزمایش شوند. static export از runtime Next.js مانند Server Actions و rewrites/headers پشتیبانی نمی‌کند. منابع: https://nextjs.org/docs/app/guides/static-exports و https://nextjs.org/docs/app/api-reference/functions/generate-static-params و https://developer.woocommerce.com/docs/apis/store-api/.
+
+### گزینه B — قالب اختصاصی WordPress/WooCommerce (بدون Elementor)
+**مزایا:** URL و HTML صفحات محصول، دسته‌ها، محتوا و blog به‌صورت بومی از WordPress ارائه می‌شود؛ مدیریت و انتشار محصول به rebuild فرانت‌اند وابسته نیست؛ checkout و افزونه‌های سئو/ترب در همان پلتفرم کار می‌کنند؛ کنترل طراحی با PHP templates، CSS، JavaScript و در صورت نیاز React در بخش‌های تعاملی امکان‌پذیر است. مستندات رسمی WordPress قالب‌های classic و block را پشتیبانی می‌کند و WooCommerce امکان شخصی‌سازی قالب‌ها و غیرفعال‌کردن stylesheet پیش‌فرض را مستند کرده است. منابع: https://developer.wordpress.org/themes/ و https://developer.woocommerce.com/docs/theming/theme-development/classic-theme-developer-handbook.
+**هزینه‌ها:** لازم است UI فعلی از React/Next به theme templates و componentهای مناسب PHP/JS منتقل یا بخش‌به‌بخش بازسازی شود؛ این مسیر کار توسعهٔ اولیه بیشتری می‌خواهد، اما runtime Node لازم ندارد و مسیر یکپارچه‌تری برای صفحات محصول و انتشار محتوا می‌دهد.
+
+### API و امنیت
+- WooCommerce Store API عمومی برای نمایش محصولات و عملکرد مشتری‌محور cart/checkout طراحی شده و اطلاعات حساس مدیریتی را ارائه نمی‌کند؛ عملیات cart/checkout به session و nonce یا Cart Token وابسته‌اند. منابع: https://developer.woocommerce.com/docs/apis/store-api/ و https://developer.woocommerce.com/docs/apis/store-api/cart-tokens/.
+- WooCommerce REST API احراز هویت‌شده برای مدیریت محصول، سفارش، مشتری و تنظیمات است؛ کلیدهای آن نباید در bundle مرورگر قرار گیرند. منبع: https://developer.woocommerce.com/docs/apis/.
+- اگر UI Next.js ایستا مستقیماً Store API را مصرف کند، باید رفتار CORS، cookie/session یا Cart Token، nonce، روش پرداخت و افزونه‌های پرداخت ایرانی روی دامنهٔ نهایی تست شود. این موارد هنوز آزمایش نشده‌اند.
+
+### توصیهٔ موقت پس از مقایسه
+با توجه به اینکه هنوز هاست/دامنه خریداری نشده، Node.js در هاست هدف قابل اجرا نیست، فروشگاه به صفحات محصول SEO-friendly و ترب نیاز دارد و کاربران باید محصولات را از پیشخوان WooCommerce مدیریت کنند، **گزینه B (قالب اختصاصی WordPress/WooCommerce بدون Elementor) در حال حاضر مسیر کم‌ریسک‌تر برای production به نظر می‌رسد**. این توصیه به معنی انتخاب قالب آماده یا کنار گذاشتن UI اختصاصی نیست؛ می‌توان یک theme اختصاصی سبک ساخت و design system/ظاهر فعلی را به آن منتقل کرد.
+
+بااین‌حال برای جلوگیری از تصمیم زودهنگام، قبل از مهاجرت کامل باید proof-of-concept کوچکی انجام شود: یک هدر/hero از UI فعلی، یک آرشیو محصول، یک صفحه محصول با structured data/metadata و مسیر cart/checkout در قالب WordPress اختصاصی؛ سپس در کنار آن static export واقعی فعلی build شود تا هزینه و محدودیت‌ها با شواهد مقایسه شوند. هنوز هیچ‌کدام اجرا نشده‌اند و گزینه B تصمیم نهایی کاربر محسوب نمی‌شود.
+
+### معیارهای پذیرش برای انتخاب معماری
+- افزودن/ویرایش محصول از پیشخوان WooCommerce بدون ویرایش کد یا rebuild دستی برای هر محصول.
+- URL عمومی و پایدار محصول، HTML قابل‌خزش و metadata/canonical مناسب.
+- افزونهٔ رسمی ترب بتواند با محصول منتشرشده کار کند و مراحل ثبت/تأیید ترب روشن باشد.
+- cart/checkout قیمت و موجودی را از WooCommerce اعتبارسنجی کند و روش پرداخت/ارسال واقعی قابل تست باشد.
+- UI فارسی RTL و طراحی اختصاصی بدون Elementor قابل پیاده‌سازی باشد.
+- deployment روی هاست هدف بدون Node.js server runtime انجام شود.
+- backup/restore و مهاجرت داده از Firebase طرح روشن داشته باشد.
+
+### وضعیت ممیزی
+این بخش فقط مقایسهٔ مستندات و کد فعلی است. هنوز proof-of-concept، build، تست پرداخت، تست ترب یا نصب WordPress انجام نشده است.
